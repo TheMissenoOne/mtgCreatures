@@ -8,9 +8,6 @@ Generates stat blocks in a format compatible with D&D 5th Edition.
 Installation
 Clone this repository to your local machine.
 Make sure you have Python 3.x installed.
-Install the required Python packages using the following command:
-Copy code
-pip install -r requirements.txt
 
 ## Contributing
 If you'd like to contribute to this project, feel free to submit a pull request. We welcome any improvements or additional features!
