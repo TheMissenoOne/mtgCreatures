@@ -11,3 +11,4 @@ Make sure you have Python 3.x installed.
 
 ## Contributing
 If you'd like to contribute to this project, feel free to submit a pull request. We welcome any improvements or additional features!
+D&D Monster Stats in JSON format sourced from: https://gist.github.com/tkfu/9819e4ac6d529e225e9fc58b358c3479
