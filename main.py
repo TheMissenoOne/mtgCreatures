@@ -459,11 +459,11 @@ with open('ravnicaCreatures.json', encoding="utf8") as data_file:
                         if  convertedSpeed.split(" ")[0] == speed.split(" ") and convertedSpeed.split(" ")[len(convertedSpeed.split(" "))-2] < speed.split(" ")[len(speed.split(" "))]:
                           convertedCreature['Speed'] = convertedCreature['Speed'].replace(convertedSpeed,speed)
               if "Traits" in loadedCreatures[type]:
-                convertedCreature["Traits"] = convertedCreature["Traits"] + loadedCreatures[type]["Traits"]
                 for keyword in keywords.keys():
                   # convertedCreature["Traits"] = convertedCreature["Traits"].replace(keyword,keywords[keyword])
                   replaceObj = re.compile(re.escape(keyword), re.IGNORECASE)
                   convertedCreature["Traits"] = replaceObj.sub(keywords[keyword], convertedCreature["Traits"])
+                  convertedCreature["Traits"] = convertedCreature["Traits"] + loadedCreatures[type]["Traits"]
               if "Actions" in loadedCreatures[type]:
                   convertedCreature["Actions"] = convertedCreature["Actions"] + loadedCreatures[type]["Actions"]
               if "Languages" in loadedCreatures[type]:
