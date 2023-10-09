@@ -463,7 +463,7 @@ with open('ravnicaCreatures.json', encoding="utf8") as data_file:
                   # convertedCreature["Traits"] = convertedCreature["Traits"].replace(keyword,keywords[keyword])
                   replaceObj = re.compile(re.escape(keyword), re.IGNORECASE)
                   convertedCreature["Traits"] = replaceObj.sub(keywords[keyword], convertedCreature["Traits"])
-                  convertedCreature["Traits"] = convertedCreature["Traits"] + loadedCreatures[type]["Traits"]
+                convertedCreature["Traits"] = convertedCreature["Traits"] + loadedCreatures[type]["Traits"]
               if "Actions" in loadedCreatures[type]:
                   convertedCreature["Actions"] = convertedCreature["Actions"] + loadedCreatures[type]["Actions"]
               if "Languages" in loadedCreatures[type]:
