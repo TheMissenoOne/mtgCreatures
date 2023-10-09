@@ -53,11 +53,15 @@ const getStatBlock = (data) => '<div class="card_art" style="background-image: u
 \
   <property-line>\
     <h4>Damage Immunities</h4>\
-    <p>poison, psychic</p>\
+    <p>' + data['Damage Immunities'] + '</p>\
   </property-line>\
   <property-line>\
+  <h4>Damage Resistances</h4>\
+  <p>' + data['Damage Resistances'] + '</p>\
+</property-line>\
+  <property-line>\
     <h4>Condition Immunities</h4>\
-    <p>-</p>\
+    <p>' + data['Condition Immunities'] + '</p>\
   </property-line>\
   <property-line>\
     <h4>Senses</h4>\

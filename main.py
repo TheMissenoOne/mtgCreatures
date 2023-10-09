@@ -369,6 +369,9 @@ with open('ravnicaCreatures.json', encoding="utf8") as data_file:
             convertedCreature['Senses'] = ""
             convertedCreature['Speed'] = ""
             convertedCreature['meta'] = ""
+            convertedCreature['Damage Immunities'] = ""
+            convertedCreature['Condition Immunities'] = ""
+            convertedCreature['Damage Resistances'] = ""
             loadedCreatures = json.load(data_file)
             creatureCR = round(math.log(float(rarity[card["rarity"]]) / (float(card["cmc"]) / (float(card["power"]) + float(card["toughness"])))) + float(card["cmc"]))              
             types = list()
@@ -415,9 +418,37 @@ with open('ravnicaCreatures.json', encoding="utf8") as data_file:
                       for convertedSense in convertedCreature['Senses'].split('., ')[0]:
                         if  convertedSense.split(" ")[0] == sense.split(" ") and convertedSense.split(" ")[len(convertedSense.split(" "))-2] < sense.split(" ")[len(sense.split(" "))]:
                           convertedCreature['Senses'] = convertedCreature['Senses'].replace(convertedSense,sense)
-              if "Speed" in loadedCreatures[type]:
-                if loadedCreatures[type]["Speed"].split('., ')[0].split(" ")[0] != 'Passive':
-                  # print(loadedCreatures[type]["Speed"].split(','))
+              if 'Condition Immunities' in loadedCreatures[type]:
+                  for conditionImunities in loadedCreatures[type]["Condition Immunities"].split('., '): 
+                    if conditionImunities == ' ' or  conditionImunities.strip().split(" ")[0].lower() == 'passive':
+                      break
+                    if conditionImunities.split(" ")[0] not in convertedCreature['Condition Immunities']:
+                        convertedCreature['Condition Immunities'] = convertedCreature['Condition Immunities'] +", "+ conditionImunities
+                    else:
+                      for convertedConditionsImmunities in convertedCreature['Condition Immunities'].split('., ')[0]:
+                        if  convertedConditionsImmunities.split(" ")[0] == conditionImunities.split(" ") and convertedConditionsImmunities.split(" ")[len(convertedConditionsImmunities.split(" "))-2] < conditionImunities.split(" ")[len(conditionImunities.split(" "))]:
+                          convertedCreature['Condition Immunities'] = convertedCreature['Condition Immunities'].replace(convertedConditionsImmunities,conditionImunities)
+              if 'Damage Immunities' in loadedCreatures[type]:
+                  for damageImunities in loadedCreatures[type]["Damage Immunities"].split('., '): 
+                    if damageImunities == ' ' or  damageImunities.strip().split(" ")[0].lower() == 'passive':
+                      break
+                    if damageImunities.split(" ")[0] not in convertedCreature['Damage Immunities']:
+                        convertedCreature['Damage Immunities'] = convertedCreature['Damage Immunities'] +", "+ damageImunities
+                    else:
+                      for convertedDamageImmunities in convertedCreature['Damage Immunities'].split('., ')[0]:
+                        if  convertedDamageImmunities.split(" ")[0] == damageImunities.split(" ") and convertedDamageImmunities.split(" ")[len(convertedDamageImmunities.split(" "))-2] < damageImunities.split(" ")[len(damageImunities.split(" "))]:
+                          convertedCreature['Damage Immunities'] = convertedCreature['Damage Immunities'].replace(convertedDamageImmunities,damageImunities)
+              if 'Damage Resistances' in loadedCreatures[type]:
+                  for damageResistance in loadedCreatures[type]["Damage Resistances"].split('., '): 
+                    if damageResistance == ' ' or  damageResistance.strip().split(" ")[0].lower() == 'passive':
+                      break
+                    if damageResistance.split(" ")[0] not in convertedCreature['Damage Resistances']:
+                        convertedCreature['Damage Resistances'] = convertedCreature['Damage Resistances'] +", "+ damageResistance
+                    else:
+                      for convertedDamageResistance in convertedCreature['Damage Resistances'].split('., ')[0]:
+                        if  convertedDamageResistance.split(" ")[0] == damageResistance.split(" ") and convertedDamageResistance.split(" ")[len(convertedDamageResistance.split(" "))-2] < damageResistance.split(" ")[len(damageResistance.split(" "))]:
+                          convertedCreature['Damage Resistances'] = convertedCreature['Damage Resistances'].replace(convertedDamageResistance,damageResistance)
+              if "Speed" in loadedCreatures[type]:  
                   for speed in loadedCreatures[type]["Speed"].split('., '): 
                     if speed == ' ' or  speed.strip().split(" ")[0].lower() == 'passive':
                       break
