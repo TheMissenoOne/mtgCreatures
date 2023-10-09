@@ -1,6 +1,5 @@
 import json
 import math
-import openai
 from fractions import Fraction
 import re
 

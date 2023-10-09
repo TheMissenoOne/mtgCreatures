@@ -11,10 +11,11 @@ window.onload = function () {
             .then((data) => {
                 console.log(card)
                 document.getElementById("ficha").insertAdjacentHTML('afterbegin', getStatBlock(data[card]))
-                data.keys().forEach(element => {
+                Object.keys(data).forEach(element => {
                     let link = document.createElement("a")
-                    link.href('?card='+element.name)
-                    document.getElementById("ficha").append(link)
+                    link.href='?card='+data[element].name
+                    link.appendChild(document.createTextNode(data[element].name))
+                    document.getElementById("cards").append(link)
                 });
             });
     } catch (err) {

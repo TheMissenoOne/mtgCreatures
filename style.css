@@ -14,6 +14,31 @@
     min-height: 100%;
 }
 
+stat-block{
+    
+    margin-left: 20px;
+    margin-top: 20px;
+    height: 100%;
+}
+
+
+#cards{
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
+    max-height: calc(100% - 4rem);
+    overflow: auto;
+    display: grid;
+    background-color: black;
+    padding: 2rem;
+}
+
+#cards > a{
+    color: white;
+    text-decoration: none;
+}
+
 #ficha::before {
     z-index: 0;
     content: "";
