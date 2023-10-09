@@ -4,174 +4,248 @@ from fractions import Fraction
 import re
 
 
-challenge = [
-  {"Challenge": "0 (10 XP)",
-    "Armor Class": 10,
-    "Hit Points": 10,
-    "bonus": 1,
-    "DC": 10,},
-  {
-    "Challenge": "1/8 (25 XP)",
-    "Armor Class": 13,
-    "Hit Points": 15,
-    "bonus": 2,
-    "DC": 13,
-  },
-  {
-    "Challenge": "1/4 (50 XP)",
-    "Armor Class": 13,
-    "Hit Points": 20,
-    "bonus": 2,
-    "DC": 13,
-  },
-  {
-    "Challenge": "1/2 (100 XP)",
-    "Armor Class": 13,
-    "Hit Points": 30,
-    "bonus": 3,
-    "DC": 13,
-  },
-  {
-    "Challenge": "1 (200 XP)",
-    "Armor Class": 13,
-    "Hit Points": 40,
-    "bonus": 3,
-    "DC": 13,
-  },
-  {
-    "Challenge": "2 (450 XP)",
-    "Armor Class": 13,
-    "Hit Points": 50,
-    "bonus": 3,
-    "DC": 13,
-  },
-  {
-    "Challenge": "3 (700 XP)",
-    "Armor Class": 14,
-    "Hit Points": 65,
-    "bonus": 4,
-    "DC": 13,
-  },
-  {
-    "Challenge": "4 (1100 XP)",
-    "Armor Class": 14,
-    "Hit Points": 80,
-    "bonus": 4,
-    "DC": 14,
-  },
-  {
-    "Challenge": "5 (1800 XP)",
-    "Armor Class": 15,
-    "Hit Points": 95,
-    "bonus": 4,
-    "DC": 15,
-  },
-  {
-    "Challenge": "6 (2300 XP)",
-    "Armor Class": 15,
-    "Hit Points": 110,
-    "bonus": 4,
-    "DC": 15,
-  },
-  {
-    "Challenge": "7 (2900 XP)",
-    "Armor Class": 15,
-    "Hit Points": 130,
-    "bonus": 5,
-    "DC": 15,
-  },
-  {
-    "Challenge": "8 (3900 XP)",
-    "Armor Class": 16,
-    "Hit Points": 150,
-    "bonus": 5,
-    "DC": 16,
-  },
-  {
-    "Challenge": "9 (5000 XP)",
-    "Armor Class": 16,
-    "Hit Points": 170,
-    "bonus": 5,
-    "DC": 16,
-  },
-  {
-    "Challenge": "10 (5900 XP)",
-    "Armor Class": 17,
-    "Hit Points": 200,
-    "bonus": 5,
-    "DC": 16,
-  },
-  {
-    "Challenge": "11 (7200 XP)",
-    "Armor Class": 17,
-    "Hit Points": 220,
-    "bonus": 5,
-    "DC": 17,
-  },
-  {
-    "Challenge": "12 (8400 XP)",
-    "Armor Class": 17,
-    "Hit Points": 240,
-    "bonus": 6,
-    "DC": 18,
-  },
-  {
-    "Challenge": "13 (10000 XP)",
-    "Armor Class": 18,
-    "Hit Points": 260,
-    "bonus": 6,
-    "DC": 18,
-  },
-  {
-    "Challenge": "14 (11500 XP)",
-    "Armor Class": 18,
-    "Hit Points": 280,
-    "bonus": 6,
-    "DC": 18,
-  },
-  {
-    "Challenge": "15 (13000 XP)",
-    "Armor Class": 18,
-    "Hit Points": 300,
-    "bonus": 6,
-    "DC": 18,
-  },
-  {
-    "Challenge": "16 (15000 XP)",
-    "Armor Class": 18,
-    "Hit Points": 320,
-    "bonus": 6,
-    "DC": 18,
-  },
-  {
-    "Challenge": "17 (18000 XP)",
-    "Armor Class": 19,
-    "Hit Points": 330,
-    "bonus": 6,
-    "DC": 19,
-  },
-  {
-    "Challenge": "18 (20000 XP)",
-    "Armor Class": 19,
-    "Hit Points": 350,
-    "bonus": 6,
-    "DC": 19,
-  },
-  {
-    "Challenge": "19 (22000 XP)",
-    "Armor Class": 19,
-    "Hit Points": 370,
-    "bonus": 7,
-    "DC": 19,
-  },
-  {
-    "Challenge": "20 (25000 XP)",
-    "Armor Class": 19,
-    "Hit Points": 400,
-    "bonus": 7,
-    "DC": 19,
-  },
-]
+challenge = {
+    "0": {
+        "Challenge": "0 (10 XP)",
+        "Armor Class": 10,
+        "Hit Points": 10,
+        "bonus": 1,
+        "DC": 10,
+    },
+    "1/8": {
+        "Challenge": "1/8 (25 XP)",
+        "Armor Class": 13,
+        "Hit Points": 15,
+        "bonus": 2,
+        "DC": 13,
+    },
+    "1/4": {
+        "Challenge": "1/4 (50 XP)",
+        "Armor Class": 13,
+        "Hit Points": 20,
+        "bonus": 2,
+        "DC": 13,
+    },
+    "1/2": {
+        "Challenge": "1/2 (100 XP)",
+        "Armor Class": 13,
+        "Hit Points": 30,
+        "bonus": 3,
+        "DC": 13,
+    },
+    "1": {
+        "Challenge": "1 (200 XP)",
+        "Armor Class": 13,
+        "Hit Points": 40,
+        "bonus": 3,
+        "DC": 13,
+    },
+    "2": {
+        "Challenge": "2 (450 XP)",
+        "Armor Class": 13,
+        "Hit Points": 50,
+        "bonus": 3,
+        "DC": 13,
+    },
+    "3": {
+        "Challenge": "3 (700 XP)",
+        "Armor Class": 14,
+        "Hit Points": 65,
+        "bonus": 4,
+        "DC": 13,
+    },
+    "4": {
+        "Challenge": "4 (1100 XP)",
+        "Armor Class": 14,
+        "Hit Points": 80,
+        "bonus": 4,
+        "DC": 14,
+    },
+    "5": {
+        "Challenge": "5 (1800 XP)",
+        "Armor Class": 15,
+        "Hit Points": 95,
+        "bonus": 4,
+        "DC": 15,
+    },
+    "6": {
+        "Challenge": "6 (2300 XP)",
+        "Armor Class": 15,
+        "Hit Points": 110,
+        "bonus": 4,
+        "DC": 15,
+    },
+    "7": {
+        "Challenge": "7 (2900 XP)",
+        "Armor Class": 15,
+        "Hit Points": 130,
+        "bonus": 5,
+        "DC": 15,
+    },
+    "8": {
+        "Challenge": "8 (3900 XP)",
+        "Armor Class": 16,
+        "Hit Points": 150,
+        "bonus": 5,
+        "DC": 16,
+    },
+    "9": {
+        "Challenge": "9 (5000 XP)",
+        "Armor Class": 16,
+        "Hit Points": 170,
+        "bonus": 5,
+        "DC": 16,
+    },
+    "10": {
+        "Challenge": "10 (5900 XP)",
+        "Armor Class": 17,
+        "Hit Points": 200,
+        "bonus": 5,
+        "DC": 16,
+    },
+    "11": {
+        "Challenge": "11 (7200 XP)",
+        "Armor Class": 17,
+        "Hit Points": 220,
+        "bonus": 5,
+        "DC": 17,
+    },
+    "12": {
+        "Challenge": "12 (8400 XP)",
+        "Armor Class": 17,
+        "Hit Points": 240,
+        "bonus": 6,
+        "DC": 18,
+    },
+    "13": {
+        "Challenge": "13 (10000 XP)",
+        "Armor Class": 18,
+        "Hit Points": 260,
+        "bonus": 6,
+        "DC": 18,
+    },
+    "14": {
+        "Challenge": "14 (11500 XP)",
+        "Armor Class": 18,
+        "Hit Points": 280,
+        "bonus": 6,
+        "DC": 18,
+    },
+    "15": {
+        "Challenge": "15 (13000 XP)",
+        "Armor Class": 18,
+        "Hit Points": 300,
+        "bonus": 6,
+        "DC": 18,
+    },
+    "16": {
+        "Challenge": "16 (15000 XP)",
+        "Armor Class": 18,
+        "Hit Points": 320,
+        "bonus": 6,
+        "DC": 18,
+    },
+    "17": {
+        "Challenge": "17 (18000 XP)",
+        "Armor Class": 19,
+        "Hit Points": 330,
+        "bonus": 6,
+        "DC": 19,
+    },
+    "18": {
+        "Challenge": "18 (20000 XP)",
+        "Armor Class": 19,
+        "Hit Points": 350,
+        "bonus": 6,
+        "DC": 19,
+    },
+    "19": {
+        "Challenge": "19 (22000 XP)",
+        "Armor Class": 19,
+        "Hit Points": 370,
+        "bonus": 7,
+        "DC": 19,
+    },
+    "20": {
+        "Challenge": "20 (25000 XP)",
+        "Armor Class": 19,
+        "Hit Points": 400,
+        "bonus": 7,
+        "DC": 19,
+    },
+    "21": {
+        "Challenge": "21 (33000 XP)",
+        "Armor Class": 20,
+        "Hit Points": 450,
+        "bonus": 7,
+        "DC": 20,
+    },
+    "22": {
+        "Challenge": "22 (41000 XP)",
+        "Armor Class": 20,
+        "Hit Points": 500,
+        "bonus": 7,
+        "DC": 20,
+    },
+    "23": {
+        "Challenge": "23 (50000 XP)",
+        "Armor Class": 20,
+        "Hit Points": 550,
+        "bonus": 8,
+        "DC": 21,
+    },
+    "24": {
+        "Challenge": "24 (62000 XP)",
+        "Armor Class": 21,
+        "Hit Points": 600,
+        "bonus": 8,
+        "DC": 21,
+    },
+    "25": {
+        "Challenge": "25 (75000 XP)",
+        "Armor Class": 21,
+        "Hit Points": 650,
+        "bonus": 8,
+        "DC": 21,
+    },
+    "26": {
+        "Challenge": "26 (90000 XP)",
+        "Armor Class": 21,
+        "Hit Points": 700,
+        "bonus": 8,
+        "DC": 21,
+    },
+    "27": {
+        "Challenge": "27 (105000 XP)",
+        "Armor Class": 22,
+        "Hit Points": 800,
+        "bonus": 8,
+        "DC": 22,
+    },
+    "28": {
+        "Challenge": "28 (120000 XP)",
+        "Armor Class": 22,
+        "Hit Points": 900,
+        "bonus": 9,
+        "DC": 22,
+    },
+    "29": {
+        "Challenge": "29 (135000 XP)",
+        "Armor Class": 22,
+        "Hit Points": 1000,
+        "bonus": 9,
+        "DC": 22,
+    },
+    "30": {
+        "Challenge": "30 (155000 XP)",
+        "Armor Class": 22,
+        "Hit Points": 1100,
+        "bonus": 9,
+        "DC": 23,
+    }
+}
+
+
 
 attributes = [
     "STR",
@@ -265,20 +339,19 @@ with open('monsters.json', encoding="utf8") as data_file:
   creatures = json.load(data_file)
   for creature in creatures:
     creatureDifference = creature
-    for cr in challenge:
-      if cr['Challenge'].split(' ')[0] == creature['Challenge'].split(' ')[0]:
+    for cr in challenge.keys():
+      if cr == creature['Challenge'].split(' ')[0]:
         if isinstance(creatureDifference["Armor Class"], str):
           creatureDifference["Armor Class"] = creatureDifference["Armor Class"].split(' ')[0]
         if isinstance(creatureDifference["Hit Points"], str):
           creatureDifference["Hit Points"] = creatureDifference["Hit Points"].split(' ')[0]
         for atribute in attributes:
-          creatureDifference[atribute+"_mod"] = int(float(creature[atribute]) - Fraction(cr['Challenge'].split(' ')[0])*5/4)
-          creatureDifference[atribute] =  10                        
-        creatureDifference["Armor Class"] = int(cr["Armor Class"]) - int(creatureDifference["Armor Class"])
+          creatureDifference[atribute+"_mod"] = int(float(creature[atribute]) - (10 + Fraction(cr)*3/4))
+          creatureDifference[atribute] =  10 +creatureDifference[atribute+"_mod"]                      
+        creatureDifference["Armor Class"] = int(challenge[cr]["Armor Class"]) - int(creatureDifference["Armor Class"])
         creatureDifference["Hit Points"] = int(creatureDifference["Hit Points"])
         creatureMods[creatureDifference['name']] = creatureDifference  
         break 
- 
   jsonCreatureMods = json.dumps(creatureMods)
   with open("finalMonsters.json", "w") as outfile:
     outfile.write(jsonCreatureMods)
@@ -297,20 +370,32 @@ with open('ravnicaCreatures.json', encoding="utf8") as data_file:
             convertedCreature['Speed'] = ""
             convertedCreature['meta'] = ""
             loadedCreatures = json.load(data_file)
-            creatureCR = round(math.log(float(rarity[card["rarity"]]) / (float(card["cmc"]) / (float(card["power"]) + float(card["toughness"])))) + float(card["cmc"]))
-            for type in card['type_line'].split(' — ')[1].split(" "):   
-              if int(Fraction(loadedCreatures[type]["Challenge"].split(" ")[0])) > creatureCR:
-                creatureCR =int( round((int(Fraction(loadedCreatures[type]["Challenge"].split(" ")[0])) + creatureCR /5 )))
+            creatureCR = round(math.log(float(rarity[card["rarity"]]) / (float(card["cmc"]) / (float(card["power"]) + float(card["toughness"])))) + float(card["cmc"]))              
+            types = list()
+            for name in card['name'].split(" "):
+              if name in loadedCreatures.keys():
+                types.append(name)
               else:
-                creatureCR =int( round((int( creatureCR + Fraction(loadedCreatures[type]["Challenge"].split(" ")[0])/5) )))
-            convertedCreature.update(challenge[creatureCR])
+                with open("newTypes.txt", "a") as outfile:
+                  outfile.write( name+"\n")
+            types = (card['type_line'].split(' — ')[1].split(" "))+ types
+            for type in types:   
+              if int(Fraction(loadedCreatures[type]["Challenge"].split(" ")[0])) > creatureCR:
+                creatureCR =int( round((int(Fraction(loadedCreatures[type]["Challenge"].split(" ")[0])) + (creatureCR /5 ))))
+              else:
+                creatureCR =int( round((int( creatureCR + (Fraction(loadedCreatures[type]["Challenge"].split(" ")[0])/5)) )))
+            convertedCreature.update(challenge[str(creatureCR)])
             if hasattr(card,"flavor_text"):
                 convertedCreature["description"] = card["flavor_text"]
             for atribute in attributes:
-              convertedCreature[atribute] = round( Fraction(convertedCreature['Challenge'].split(' ')[0])*3/4 )  
-            for type in card['type_line'].split(' — ')[1].split(" "):
+              convertedCreature[atribute] = round( 10+ Fraction(convertedCreature['Challenge'].split(' ')[0])*3/4 )  
+            for type in types :
               for atribute in attributes:
-                  convertedCreature[atribute] = round(convertedCreature[atribute] + int(loadedCreatures[type][atribute+"_mod"]) )
+                if int(loadedCreatures[type][atribute]) > convertedCreature[atribute]:
+                  convertedCreature[atribute] = int(loadedCreatures[type][atribute]) + round((convertedCreature[atribute]-10 )/4)
+                else:
+                  convertedCreature[atribute] = int(convertedCreature[atribute]) + round(int(loadedCreatures[type][atribute+"_mod"])/2)
+              convertedCreature[atribute+"_mod"] = round((convertedCreature[atribute] -10)/2)
               convertedCreature["Hit Points"] = int((convertedCreature["Hit Points"] + loadedCreatures[type]["Hit Points"])/2)
               convertedCreature["Armor Class"] = convertedCreature["Armor Class"] + loadedCreatures[type]["Armor Class"]
               convertedCreature['Traits'] = card['oracle_text']
