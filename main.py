@@ -384,8 +384,8 @@ with open('ravnicaCreatures.json', encoding="utf8") as data_file:
             types = (card['type_line'].split(' — ')[1].split(" "))+ types
             for type in types:   
               if int(Fraction(loadedCreatures[type]["Challenge"].split(" ")[0])) > creatureCR:
-                creatureCR =int( round((int(Fraction(loadedCreatures[type]["Challenge"].split(" ")[0])) + (creatureCR /5 ))))
-              else:
+                # creatureCR =int( round((int(Fraction(loadedCreatures[type]["Challenge"].split(" ")[0])) + (creatureCR /5 ))))
+              # else:
                 creatureCR =int( round((int( creatureCR + (Fraction(loadedCreatures[type]["Challenge"].split(" ")[0])/5)) )))
             convertedCreature.update(challenge[str(creatureCR)])
             if hasattr(card,"flavor_text"):
