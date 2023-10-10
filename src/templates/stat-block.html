@@ -30,7 +30,7 @@
     margin-right: 2px;
 
     /* This is possibly overriden by next CSS rule. */
-    width: 400px;
+    width: 480px;
 
     -webkit-columns: 400px;
        -moz-columns: 400px;
@@ -51,7 +51,8 @@
 
   :host([data-two-column]) #content-wrap {
     /* One column is 400px and the gap between them is 40px. */
-    width: 840px;
+    width: auto;
+    max-width: 1180px;
   }
 
   ::slotted(h3) {

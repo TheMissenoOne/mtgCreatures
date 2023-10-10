@@ -14,11 +14,7 @@
       rel="stylesheet"
       type="text/css"
     />
-    <link
-      href="./style.css"
-      rel="stylesheet"
-      type="text/css"
-    />
+    <link href="./style.css" rel="stylesheet" type="text/css" />
 
     <script type="module" src="src/js/stat-block.js"></script>
     <script type="module" src="src/js/creature-heading.js"></script>
@@ -31,13 +27,21 @@
       body {
         margin: 0;
       }
-
-      
     </style>
   </head>
   <body>
+    <div class="dropdown">
+      <button id="dropdownbtn" class="dropbtn">Dropdown</button>
+      <div id="cards" class="dropdown-content">
+        <input
+          type="text"
+          placeholder="Search.."
+          id="myInput"
+          onkeyup="filterFunction()"
+        />
+      </div>
+    </div>
     <div id="ficha"></div>
-    <div id="cards"></div>
   </body>
 
   <script src="./script.js"></script>
