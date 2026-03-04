@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Encounter Generator</title>
+    <style>
+        body { font-family: monospace; background: #1a1a1a; color: #eee; padding: 20px; }
+        .test { background: #222; padding: 15px; margin: 10px 0; border-left: 3px solid #667eea; }
+        .pass { color: #00ff00; }
+        .fail { color: #ff0000; }
+    </style>
+</head>
+<body>
+    <h1>Encounter Generator Test Suite</h1>
+    <div id="results"></div>
+
+    <script>
+        const results = [];
+
+        function test(name, fn) {
+            try {
+                fn();
+                results.push({ name, status: 'pass', error: null });
+            } catch (e) {
+                results.push({ name, status: 'fail', error: e.message });
+            }
+        }
+
+        // Test 1: Load creatures
+        test('Load final.json creatures', async () => {
+            const response = await fetch('./final.json');
+            if (!response.ok) throw new Error('Failed to fetch final.json');
+            const data = await response.json();
+            if (!data || Object.keys(data).length === 0) throw new Error('No creatures loaded');
+            console.log(`✓ Loaded ${Object.keys(data).length} creatures`);
+        });
+
+        // Test 2: Color to guild conversion
+        test('Color to guild conversion', () => {
+            const colorCombos = {
+                'WU': 'azorius', 'UB': 'dimir', 'BR': 'rakdos', 'BG': 'golgari',
+                'GW': 'selesnya', 'WB': 'orzhov', 'UR': 'izzet', 'RG': 'gruul',
+                'RW': 'boros', 'UG': 'simic'
+            };
+            
+            const testColors = [['W', 'U'], ['B', 'R'], ['G', 'W']];
+            testColors.forEach(colors => {
+                const sorted = colors.sort().join('');
+                if (!colorCombos[sorted]) throw new Error(`No guild for colors: ${colors}`);
+            });
+        });
+
+        // Test 3: CR parsing
+        test('Parse CR values', () => {
+            const testCRs = ['0 (0 XP)', '8 (3900 XP)', '15 (13000 XP)'];
+            testCRs.forEach(cr => {
+                const match = cr.match(/^([\d/\.]+)/);
+                if (!match || !match[1]) throw new Error(`Failed to parse CR: ${cr}`);
+            });
+        });
+
+        // Test 4: XP thresholds calculation
+        test('Calculate XP thresholds', () => {
+            const thresholds = {
+                1: { easy: 25, medium: 50, hard: 75, deadly: 100 },
+                5: { easy: 250, medium: 500, hard: 750, deadly: 1100 }
+            };
+            
+            Object.entries(thresholds).forEach(([level, values]) => {
+                Object.entries(values).forEach(([diff, xp]) => {
+                    if (xp <= 0) throw new Error(`Invalid XP for level ${level}, difficulty ${diff}`);
+                });
+            });
+        });
+
+        // Display results
+        setTimeout(() => {
+            const html = results.map(r => `
+                <div class="test">
+                    <span class="${r.status}">[${r.status.toUpperCase()}]</span> ${r.name}
+                    ${r.error ? `<div style="color: #ff6b6b; margin-top: 5px;">Error: ${r.error}</div>` : ''}
+                </div>
+            `).join('');
+            
+            document.getElementById('results').innerHTML = html;
+            
+            const passed = results.filter(r => r.status === 'pass').length;
+            const total = results.length;
+            document.body.insertAdjacentHTML('afterbegin', 
+                `<h2>${passed}/${total} tests passed</h2>`
+            );
+        }, 500);
+    </script>
+</body>
+</html>

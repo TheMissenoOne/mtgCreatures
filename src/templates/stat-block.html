@@ -5,6 +5,7 @@
     border: 1px solid #000;
     position: relative;
     z-index: 1;
+    max-width: 419px;
   }
 
   :host {
@@ -12,6 +13,8 @@
   }
 
   #content-wrap {
+    margin-bottom: 56px;
+    max-width: 400px;
     font-family: 'Noto Sans', 'Myriad Pro', Calibri, Helvetica, Arial,
                   sans-serif;
     font-size: 13.5px;
@@ -30,7 +33,7 @@
     margin-right: 2px;
 
     /* This is possibly overriden by next CSS rule. */
-    width: 480px;
+
 
     -webkit-columns: 400px;
        -moz-columns: 400px;
@@ -41,7 +44,7 @@
 
     /* We can't use CSS3 attr() here because no browser currently supports it,
        but we can use a CSS custom property instead. */
-    height: var(--data-content-height);
+    
 
     /* When height is constrained, we want sequential filling of columns. */
     -webkit-column-fill: auto;
