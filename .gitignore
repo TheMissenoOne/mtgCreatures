@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+backend/logs/*.log
+*.logbackup
+
+# Temp files
+data/temp/*
+!data/temp/.gitkeep
+*.tmp
+*.bak
+
+# OS specific
+.DS_Store
+Thumbs.db
+.directory
+
+# Project specific
+.env
+config.local.py
+
+# IDE settings
+.vscode/settings.json
+.idea/workspace.xml
+*.iml
+
+# Dependencies (if using requirements.txt)
+# venv should be in gitignore above
+
+# Keep directories with .gitkeep
+!*/
+!.gitkeep
