@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Gerador de Encontros Ravnica - D&D 5e</title>
-    <meta name="description" content="Gerador de encontros aleatórios com tema Ravnica para D&D 5e" />
+    <title>Ravnica Encounter Generator - D&D 5e</title>
+    <meta name="description" content="Generate random encounters themed for D&D 5e in Ravnica" />
     <link href="//fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
     <link href="styles/style.css" rel="stylesheet" type="text/css" />
     <!-- Custom elements for stat blocks -->
@@ -291,63 +291,63 @@
 </head>
 <body>
     <div class="encounters-header">
-        <h1>⚔️ Gerador de Encontros Ravnica</h1>
-        <p>Gere encontros temáticos para suas campanhas D&D 5e em Ravnica</p>
-        <button class="back-btn" onclick="window.location.href='index.html'" title="Voltar aos Monstros">📖 Ver Criaturas</button>
+        <h1>⚔️ Ravnica Encounter Generator</h1>
+        <p>Generate thematic encounters for your D&D 5e campaigns in Ravnica</p>
+        <button class="back-btn" onclick="window.location.href='../index.html'" title="Back to Creatures">📖 View Creatures</button>
     </div>
 
     <div class="encounters-container">
         <div class="encounter-panel">
-            <h2>⚙️ Configuração do Encontro</h2>
+            <h2>⚙️ Encounter Configuration</h2>
             
             <div class="form-group">
-                <label for="environment">🏙️ Ambiente</label>
+                <label for="environment">🏙️ Environment</label>
                 <select id="environment">
-                    <option value="">-- Selecione um ambiente --</option>
-                    <option value="azorius">🏛️ Distrito Administrativo Azorius</option>
-                    <option value="orzhov">⛪ Catedral Orzhov</option>
-                    <option value="izzet">🧪 Laboratório Izzet</option>
-                    <option value="rakdos">🎭 Arena Rakdos</option>
-                    <option value="selesnya">🌳 Jardim Selesnya</option>
-                    <option value="golgari">☠️ Subterrâneos Golgari</option>
-                    <option value="simic">🧬 Zonas Simic</option>
-                    <option value="gruul">🪨 Território Gruul</option>
-                    <option value="boros">⚔️ Quartel Boros</option>
-                    <option value="dimir">🕵️ Célula Dimir</option>
-                    <option value="random">🎲 Aleatório</option>
+                    <option value="">-- Select an environment --</option>
+                    <option value="azorius">🏛️ Azorius Administrative District</option>
+                    <option value="orzhov">⛪ Orzhov Cathedral</option>
+                    <option value="izzet">🧪 Izzet Laboratory</option>
+                    <option value="rakdos">🎭 Rakdos Arena</option>
+                    <option value="selesnya">🌳 Selesnya Garden</option>
+                    <option value="golgari">☠️ Golgari Catacombs</option>
+                    <option value="simic">🧬 Simic Zones</option>
+                    <option value="gruul">🪨 Gruul Territory</option>
+                    <option value="boros">⚔️ Boros Garrison</option>
+                    <option value="dimir">🕵️ Dimir Cell</option>
+                    <option value="random">🎲 Random</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="partySize">👥 Número de Personagens</label>
+                <label for="partySize">👥 Party Size</label>
                 <input type="number" id="partySize" min="1" max="10" value="4" />
             </div>
 
             <div class="form-group">
-                <label for="partyLevel">⚔️ Nível do Grupo</label>
+                <label for="partyLevel">⚔️ Party Level</label>
                 <input type="number" id="partyLevel" min="1" max="20" value="1" />
             </div>
 
             <div class="form-group">
-                <label for="difficulty">📊 Dificuldade Desejada</label>
+                <label for="difficulty">📊 Desired Difficulty</label>
                 <select id="difficulty">
-                    <option value="random">🎲 Aleatória</option>
+                    <option value="random">🎲 Random</option>
                     <option value="trivial">Trivial</option>
-                    <option value="easy">Fácil</option>
-                    <option value="medium">Média</option>
-                    <option value="hard">Difícil</option>
-                    <option value="deadly">Mortal</option>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                    <option value="deadly">Deadly</option>
                 </select>
             </div>
 
             <div class="button-group">
-                <button onclick="generateEncounter()">🎲 Gerar Encontro</button>
-                <button class="secondary" onclick="openCreaturesTab()">📖 Ver Criaturas</button>
+                <button onclick="generateEncounter()">🎲 Generate Encounter</button>
+                <button class="secondary" onclick="openCreaturesTab()">📖 View Creatures</button>
             </div>
         </div>
 
         <div class="encounter-result" id="encounterResult">
-            <h3 id="encounterTitle">Encontro Gerado</h3>
+            <h3 id="encounterTitle">Generated Encounter</h3>
             <div id="encounterContent"></div>
         </div>
     </div>
