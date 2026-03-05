@@ -156,100 +156,98 @@ COLOR_TRAIT_BALANCE = {
 
 
 # ==========================================================
-# KEYWORDS (HTML strings for statblock display)
+# KEYWORDS (D&D 5e mechanics for statblock display)
 # ==========================================================
-# Mantemos as entradas em HTML para compatibilidade com visualizadores.
+# MTG keywords converted to authentic D&D 5e mechanics
 KEYWORDS = {
 
-    # Core MTG -> D&D translations (refinadas)
-    "Flying": "<property-block><h4>Flying.</h4><p>The creature has a flying speed equal to its walking speed. Melee attacks against it from non-flying creatures are made with disadvantage.</p></property-block>",
+    # Core MTG → D&D 5e conversions
+    "Flying": "<property-block><h4>Flight.</h4><p>The creature has a flying speed equal to its walking speed. Creatures on the ground have disadvantage on melee attack rolls against this creature.</p></property-block>",
 
-    "Haste": "<property-block><h4>Haste.</h4><p>The creature adds its proficiency bonus to initiative and may take one additional action on its first turn of combat.</p></property-block>",
+    "Haste": "<property-block><h4>Pent-Up Energy.</h4><p>The creature gains a +2 bonus to initiative rolls. On its first turn of combat, it can use its bonus action to take the Attack action.</p></property-block>",
 
-    "Vigilance": "<property-block><h4>Vigilance.</h4><p>The creature does not provoke opportunity attacks when it makes melee attacks and retains its reaction after attacking.</p></property-block>",
+    "Vigilance": "<property-block><h4>Combat Readiness.</h4><p>When this creature makes a melee attack, it doesn't provoke opportunity attacks from the target and its defensive reaction isn't expended.</p></property-block>",
 
-    "Trample": "<property-block><h4>Trample.</h4><p>When this creature reduces a creature to 0 HP with a melee attack, excess damage carries over to another creature within 5 feet.</p></property-block>",
+    "Trample": "<property-block><h4>Trampling Charge.</h4><p>When the creature moves through a hostile creature's space and succeeds on a melee attack roll, it can move through that creature's space as if the space were difficult terrain. If the creature ends its movement in an occupied space, that creature is knocked prone.</p></property-block>",
 
-    "Lifelink": "<property-block><h4>Lifelink.</h4><p>Whenever this creature deals damage, it regains hit points equal to half the damage dealt.</p></property-block>",
+    "Lifelink": "<property-block><h4>Life Drain.</h4><p>Whenever this creature deals damage to a creature, the creature that dealt the damage regains hit points equal to half the damage dealt (minimum 1).</p></property-block>",
 
-    "Deathtouch": "<property-block><h4>Deathtouch.</h4><p>Any creature damaged by this creature must succeed on a Constitution saving throw (DC based on CR) or be reduced to 0 hit points.</p></property-block>",
+    "Deathtouch": "<property-block><h4>Necrotic Aura.</h4><p>Any creature hit by this creature's attack must succeed on a Constitution saving throw (DC = 8 + the creature's proficiency bonus + its Strength or Dexterity modifier) or take an additional 1d6 necrotic damage and be vulnerable to necrotic damage until the end of its next turn.</p></property-block>",
 
-    "Hexproof": "<property-block><h4>Hexproof.</h4><p>This creature cannot be targeted by hostile spells or effects unless it chooses to be.</p></property-block>",
+    "Hexproof": "<property-block><h4>Magic Resistance.</h4><p>The creature has advantage on saving throws against spells and magical effects. Spells and magical effects cannot target this creature unless it allows it (it can allow beneficial effects).</p></property-block>",
 
-    "Indestructible": "<property-block><h4>Indestructible.</h4><p>This creature cannot be reduced below 1 HP by damage and is immune to nonmagical bludgeoning, piercing, and slashing damage.</p></property-block>",
+    "Indestructible": "<property-block><h4>Undying.</h4><p>The creature has resistance to all damage. When reduced to 0 hit points, it can make a Constitution saving throw (DC 10 + damage taken) to instead drop to 1 hit point instead.</p></property-block>",
 
-    "Reach": "<property-block><h4>Reach.</h4><p>This creature's melee attacks have 10 feet of reach.</p></property-block>",
+    "Reach": "<property-block><h4>Long Reach.</h4><p>This creature's melee attacks have a reach of 10 feet, instead of 5 feet.</p></property-block>",
 
-    "Menace": "<property-block><h4>Menace.</h4><p>This creature cannot be grappled, flanked, or restrained unless two or more creatures are within 5 feet of it.</p></property-block>",
+    "Menace": "<property-block><h4>Menacing Presence.</h4><p>A creature must have advantage on attack rolls to hit this creature, unless at least two other creatures are within 5 feet of this creature. This creature also has advantage on attack rolls against creatures it's flanking.</p></property-block>",
 
-    "First Strike": "<property-block><h4>First Strike.</h4><p>During the first round of combat, this creature makes its attacks before other creatures regardless of initiative.</p></property-block>",
+    "First Strike": "<property-block><h4>Reactive Strike.</h4><p>The creature has a +3 bonus to initiative. During the first round of combat, this creature can take an additional reaction.</p></property-block>",
 
-    "Double Strike": "<property-block><h4>Double Strike.</h4><p>When this creature takes the Attack action, it makes one additional attack.</p></property-block>",
+    "Double Strike": "<property-block><h4>Rapid Strike.</h4><p>When the creature takes the Attack action on its turn, it can make one additional attack using the same action.</p></property-block>",
 
-    "Flash": "<property-block><h4>Flash.</h4><p>This creature may enter combat as a reaction when initiative is rolled and acts immediately after the current creature.</p></property-block>",
+    "Flash": "<property-block><h4>Sudden Appearance.</h4><p>This creature can use its reaction when initiative is rolled to enter combat immediately, taking its turn before creatures with lower initiative.</p></property-block>",
 
-    "Defender": "<property-block><h4>Defender.</h4><p>This creature cannot take the Attack action on its turn but may attack as a reaction when a creature enters its reach.</p></property-block>",
+    "Defender": "<property-block><h4>Guardian's Stance.</h4><p>This creature cannot take the Attack action on its turn. Instead, it can make a melee attack with disadvantage as a reaction when a hostile creature enters its reach.</p></property-block>",
 
-    # Ravnica / block-specific mechanics (adicionados)
-    "Forecast": "<property-block><h4>Forecast.</h4><p>Once per round, at the start of its turn (maintenance), the creature may reveal a held ability and pay its cost to gain a small immediate effect (examples: +1d6 radiant damage this turn, impose Disadvantage on one saving throw against it). This is usable only while 'holding' a prepared ability.</p></property-block>",
+    # Ravnica-specific mechanics (D&D 5e aligned)
+    "Forecast": "<property-block><h4>Predictive Analysis.</h4><p>At the start of each of its turns, this creature can use its bonus action to prepare a tactical response. Until the start of its next turn, the creature gains advantage on initiative or adding +2 to its next attack roll.</p></property-block>",
 
-    "Radiance": "<property-block><h4>Radiance.</h4><p>When this effect targets a creature, it also affects every other creature that shares at least one color with that target within 30 feet (same effect, halved against each additional creature unless specified).</p></property-block>",
+    "Radiance": "<property-block><h4>Radiating Effect.</h4><p>When this creature uses an ability that affects a target, up to three other creatures of the same creature type within 30 feet must make a Wisdom saving throw (same DC) or be affected by half the effect (rounded down).</p></property-block>",
 
-    "Transmute": "<property-block><h4>Transmute.</h4><p>As an action, the creature can discard a prepared effect and pay a cost to search its 'library' (ability table) for another effect with equal converted mana value and choose to prepare it (flavour: long resting/ritual required).</p></property-block>",
+    "Transmute": "<property-block><h4>Adaptive Tactics.</h4><p>As an action, this creature can swap one of its ability scores (minimum 3, maximum 18) for another prepared ability within 24 hours of preparation (equivalent to a long rest). It can use this trait only once per long rest.</p></property-block>",
 
-    "Dredge": "<property-block><h4>Dredge (Escavar).</h4><p>If this creature would draw a card (or gain an effect), it may instead mill X cards from its library (graveyard interaction). Mechanically, grants a daily chance to recover a spent ability from the graveyard after performing the dredge cost.</p></property-block>",
+    "Dredge": "<property-block><h4>Resurrection Recovery.</h4><p>When this creature is reduced to 0 hit points, it can make a Constitution saving throw (DC 10 + damage taken). On a success, it regains 1d6 hit points instead and must complete a long rest before using this trait again.</p></property-block>",
 
-    "Bloodthirst": "<property-block><h4>Bloodthirst.</h4><p>When this creature enters combat and an enemy has already taken damage this turn, it enters with a temporary bonus to attack and damage (visualized as +1 to attack rolls and +1d6 damage per Bloodthirst counter).</p></property-block>",
+    "Bloodthirst": "<property-block><h4>Battle Fury.</h4><p>When this creature enters combat and an enemy has already taken damage this turn, this creature gains +2 to its attack rolls and deals an extra 1d6 damage with weapon attacks until the end of its next turn.</p></property-block>",
 
-    "Replicate": "<property-block><h4>Replicate.</h4><p>As an action, the creature may pay a replicate cost to copy a spell-like effect it is casting; each additional payment creates another copy (copies target freely). Each extra copy increases effective DPR.</p></property-block>",
+    "Replicate": "<property-block><h4>Mirrored Action.</h4><p>When this creature uses an ability that affects one target, it can pay an additional cost (expending a use of another ability) to target up to two additional creatures within 30 feet with the same effect.</p></property-block>",
 
-    "Haunt": "<property-block><h4>Haunt.</h4><p>When this creature's ability or item goes to the graveyard, it may exile it 'haunting' a target. When the haunted creature dies, the haunted effect triggers from the exile (delayed triggered ability).</p></property-block>",
+    "Haunt": "<property-block><h4>Lingering Spirit.</h4><p>When this creature would be reduced to 0 hit points by a creature it can see, it can instead become invisible and intangible until the end of its next turn, moving up to half its speed. The triggering creature must make a Wisdom saving throw (DC = 8 + Proficiency + Charisma mod) or be frightened until the end of its next turn.</p></property-block>",
 
-    "Hellbent": "<property-block><h4>Hellbent.</h4><p>This creature gains bonus effects while it (or its controller) has no cards in hand (flavour: when empty-handed, gains +1 attack and special perks).</p></property-block>",
+    "Hellbent": "<property-block><h4>Desperate Power.</h4><p>When this creature has no bonus actions remaining on its turn, it gains +1 to its attack rolls and damage rolls until the end of its turn.</p></property-block>",
 
-    "Convoke": "<property-block><h4>Convoke.</h4><p>Allied creatures may help pay for the creature's abilities: each willing ally within 5 feet can expend a minor resource to reduce the cost (flavour: their effort powers the effect).</p></property-block>",
+    "Convoke": "<property-block><h4>Communal Power.</h4><p>This creature's allies within 10 feet can use their reaction to grant this creature advantage on an ability check or attack roll it's making. A creature can use this reaction only once per turn.</p></property-block>",
 
-    "Graft": "<property-block><h4>Graft.</h4><p>This creature enters with +1/+1 counters (markers). When another creature enters the battlefield under its controller, it may move one of its counters to that creature.</p></property-block>",
+    "Graft": "<property-block><h4>Adaptive Growth.</h4><p>This creature enters with 2 growth counters. When another allied creature enters the battlefield within 5 feet, this creature can move one growth counter to that creature, increasing its attack and damage rolls by +1 until the counter is removed.</p></property-block>",
 
-    "Detain": "<property-block><h4>Detain.</h4><p>As an action, the creature can prevent a target permanent from using activated abilities, attacking or blocking until the start of its controller's next turn (save allowed).</p></property-block>",
+    "Detain": "<property-block><h4>Binding Hold.</h4><p>As an action, this creature can target one creature it can see within 30 feet. The target must make a Strength saving throw (DC = 8 + Proficiency + Strength mod). On a failure, the target is restrained until the start of this creature's next turn. If the target is restrained at the start of its turn, it can repeat the save.</p></property-block>",
 
-    "Battalion": "<property-block><h4>Battalion.</h4><p>When this creature attacks along with at least two other allies, it triggers a bonus effect (extra damage or a short buff for the attack).</p></property-block>",
+    "Battalion": "<property-block><h4>Coordinated Strike.</h4><p>When this creature attacks with at least two other allies within 5 feet of the target, this creature has advantage on the attack roll and deals an extra 1d6 damage on a hit.</p></property-block>",
 
-    "Cipher": "<property-block><h4>Cipher.</h4><p>When this creature deals combat damage to a player, a stored spell is automatically cast without paying its cost (represents repeated casting).</p></property-block>",
+    "Cipher": "<property-block><h4>Spell Cipher.</h4><p>When this creature deals melee damage to a creature, it can trigger one prepared spell-like ability (recharge 5–6). The ability is cast on the target without expending a spell slot.</p></property-block>",
 
-    "Scavenge": "<property-block><h4>Scavenge.</h4><p>As an action, you can exile this creature from the graveyard to put +1/+1 counters equal to its power onto a target allied creature.</p></property-block>",
+    "Scavenge": "<property-block><h4>Carrion Recovery.</h4><p>As an action, this creature can gain temporary hit points equal to 1d6 + its Constitution modifier if a creature has died within 10 feet of it since its last turn. It can gain temporary hit points this way only once per day.</p></property-block>",
 
-    "Bloodrush": "<property-block><h4>Bloodrush.</h4><p>As a reaction, discard this creature card to give an attacking creature a bonus to attack and damage until end of turn (flavour: one-use buff).</p></property-block>",
+    "Bloodrush": "<property-block><h4>Frenzied Strike.</h4><p>As a reaction when a nearby creature attacks, this creature can make a melee attack roll with advantage against that creature. If the attack hits, the attacking creature has disadvantage on its attack roll.</p></property-block>",
 
-    "Overload": "<property-block><h4>Overload.</h4><p>When casting a spell, the caster may pay an alternate cost to change targets from single to 'each' in a valid area, converting a single-target spell into an area effect (save applies, often with reduced potency).</p></property-block>",
+    "Overload": "<property-block><h4>Cascade Effect.</h4><p>When this creature uses an ability that targets one creature, it can pay double the resource cost to target all creatures in a 20-foot radius instead. Affected creatures make a Dexterity saving throw (same DC) and take half damage on a success.</p></property-block>",
 
-    "Extort": "<property-block><h4>Extort.</h4><p>Whenever you cast a spell, you may pay an additional small cost to drain 1 life from each opponent and heal the caster for the same amount (stackable per spell cast).</p></property-block>",
+    "Extort": "<property-block><h4>Profane Drain.</h4><p>Whenever this creature deals damage with an ability, each creature within 10 feet of it must make a Wisdom saving throw (DC = 8 + Proficiency + Charisma mod) or take 1d4 psychic damage. This creature regains hit points equal to the total damage dealt.</p></property-block>",
 
-    "Unleash": "<property-block><h4>Unleash.</h4><p>This creature can enter with a +1/+1 counter; while it has this counter, it cannot block. The counter provides an immediate offensive boost that must be weighed against reduced blocking.</p></property-block>",
+    "Unleash": "<property-block><h4>Primal Fury.</h4><p>This creature can enter with a fury counter. While it has this counter, this creature cannot use reactions and its movement speed is increased by 10 feet, and it has advantage on Strength checks and saving throws. The counter persists until the end of combat.</p></property-block>",
 
-    "Populate": "<property-block><h4>Populate.</h4><p>Create a token copy of a creature token you control (or a simplified duplicate of a specific allied weak creature).</p></property-block>",
+    "Populate": "<property-block><h4>Conjured Ally.</h4><p>As a bonus action, this creature can create a duplicate of itself with half its hit points (rounded down) within 5 feet of it. The duplicate acts immediately after this creature in initiative and obeys this creature's mental commands. The duplicate lasts until the end of the encounter.</p></property-block>",
 
-    "Evolve": "<property-block><h4>Evolve.</h4><p>Whenever a creature with greater power or toughness enters under your control, this creature gets a +1/+1 counter.</p></property-block>",
+    "Evolve": "<property-block><h4>Adaptive Evolution.</h4><p>Whenever an allied creature with higher hit points than this creature enters within 10 feet of it, this creature gains a growth counter. When this creature gains 3 growth counters, it regains 1d8 hit points and loses all counters.</p></property-block>",
 
-    "Addendum": "<property-block><h4>Addendum.</h4><p>If you cast this effect during your main phase, you gain an enhanced effect (bonus or improved potency).</p></property-block>",
+    "Addendum": "<property-block><h4>Tactical Amendment.</h4><p>If this creature uses an ability during its main action phase (before declaring an action), it gains advantage on the next ability check or save it makes before the end of its turn.</p></property-block>",
 
-    "Mentor": "<property-block><h4>Mentor.</h4><p>When this creature attacks, it can place a +1/+1 counter on an attacking ally with lower power.</p></property-block>",
+    "Mentor": "<property-block><h4>Tactical Guidance.</h4><p>When this creature hits with a melee attack, one allied creature within 5 feet gains a +2 bonus to its next attack roll before the end of this creature's next turn.</p></property-block>",
 
-    "Surveil": "<property-block><h4>Surveil.</h4><p>Look at the top N cards of your library (or equivalent ability list); you may put any number into your graveyard (used to sculpt future draws / effects).</p></property-block>",
+    "Surveil": "<property-block><h4>Tactical Assessment.</h4><p>As a bonus action, this creature can look at the next 3 creatures to act in initiative order within 60 feet. You can rearrange the order in which they will act (this affects initiative for this encounter only).</p></property-block>",
 
-    "Undergrowth": "<property-block><h4>Undergrowth.</h4><p>This creature's abilities scale with the number of creature cards in its controller's graveyard (e.g., +1 DPR per 3 creature cards).</p></property-block>",
+    "Undergrowth": "<property-block><h4>Graveyard Empowerment.</h4><p>For each allied dead or unconscious creature within 30 feet, this creature gains +1 to its attack rolls and damage rolls (maximum +5). When an unconscious creature regains consciousness, this bonus decreases by 1.</p></property-block>",
 
-    "Riot": "<property-block><h4>Riot.</h4><p>As this creature enters the battlefield, choose between a +1/+1 counter or haste until end of turn.</p></property-block>",
+    "Riot": "<property-block><h4>Frenzied Entry.</h4><p>When this creature enters combat, it can choose one: gain a +2 bonus to attack rolls until the end of its next turn, or gain an additional reaction until the end of its next turn.</p></property-block>",
 
-    "Jump-start": "<property-block><h4>Jump-start.</h4><p>When casting this spell from the graveyard, you must discard an additional card in addition to paying other costs.</p></property-block>",
+    "Jump-start": "<property-block><h4>Resurrection.</h4><p>When this creature would be reduced to 0 hit points, it can use its reaction to regain 1d8 + Constitution modifier hit points instead. It must complete a short rest before using this trait again.</p></property-block>",
 
-    "Afterlife": "<property-block><h4>Afterlife.</h4><p>When this creature dies, create X spirit tokens (1/1 flying) as specified by the ability.</p></property-block>",
+    "Afterlife": "<property-block><h4>Spectral Echo.</h4><p>When this creature is reduced to 0 hit points, 1d4 spectral servants (1 HP, flying) appear in unoccupied spaces within 5 feet of it. They act immediately after this creature in initiative and obey its commands.</p></property-block>",
 
-    "Spectacle": "<property-block><h4>Spectacle.</h4><p>You may cast this spell for an alternate (often reduced) cost if an opponent lost life this turn.</p></property-block>",
+    "Spectacle": "<property-block><h4>Crowd Momentum.</h4><p>You can use this creature's ability for half the normal cost if an enemy within 30 feet has taken damage since the start of this creature's last turn.</p></property-block>",
 
-    "Convoke": "<property-block><h4>Convoke.</h4><p>Allied creatures may help pay the cost of an ability by expending small resources; each helper reduces the cost by a discrete increment.</p></property-block>",
-
-    "Adapt": "<property-block><h4>Adapt.</h4><p>Pay a cost to put +1/+1 counters on this creature, but only if it has no +1/+1 counters currently.</p></property-block>",
+    "Adapt": "<property-block><h4>Reactive Adaptation.</h4><p>As a bonus action on its turn, this creature can gain a mutations counter. When this creature gains 3 mutations counters, it gains advantage on all attack rolls and saving throws until the end of its next turn, then loses all counters.</p></property-block>",
 }
 
 # ==========================================================
