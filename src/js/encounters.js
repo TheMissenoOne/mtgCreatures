@@ -205,7 +205,7 @@ async function loadCreatures() {
     if (CREATURES_DATABASE) return CREATURES_DATABASE;
     
     try {
-        const response = await fetch('../../data/output/final.json');
+        const response = await fetch('../data/output/final.json');
         CREATURES_DATABASE = await response.json();
         return CREATURES_DATABASE;
     } catch (error) {
