@@ -116,7 +116,7 @@ python backend/analysis/analyze_trait_costs.py
 # Open src/encounters.html to test the encounter generator
 ```
 
-## 📊 Data Flow
+## Data Flow
 
 ```
 data/source/

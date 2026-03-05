@@ -49,7 +49,7 @@ Convert Magic: The Gathering creatures into D&D 5e stat blocks! This tool bridge
 - Mobile-optimized responsive design
 - Touch-friendly interface for tablets and phones
 
-### ⚔️ Encounter Generator (`encounters.html`)
+### Encounter Generator (`encounters.html`)
 **Real-time encounter generation with actual creature data!**
 
 Generate balanced D&D encounters using creatures from your Ravnica cards:
@@ -63,9 +63,9 @@ Generate balanced D&D encounters using creatures from your Ravnica cards:
 
 **Encounter Configuration:**
 - 🏛️ **Environment** - Choose from 10 Ravnica guild districts or random
-- 👥 **Party Size** - Recommend 3-6 adventurers (scales XP multipliers)
-- ⚔️ **Party Level** - Levels 1-20 supported (CR recommendations adjust dynamically)
-- 🎯 **Difficulty** - Easy (trivial encounters), Medium (balanced), Hard (challenging), Deadly (near-TPK)
+- **Party Size** - Recommend 3-6 adventurers (scales XP multipliers)
+- **Party Level** - Levels 1-20 supported (CR recommendations adjust dynamically)
+- **Difficulty** - Easy (trivial encounters), Medium (balanced), Hard (challenging), Deadly (near-TPK)
 
 **Example:**
 - Party: 4 PCs, Level 5, Medium Difficulty

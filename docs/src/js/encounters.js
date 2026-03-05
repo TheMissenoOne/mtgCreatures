@@ -71,7 +71,7 @@ const ENVIRONMENTS = {
     },
     boros: {
         name: "Boros Garrison",
-        icon: "⚔️",
+        icon: "",
         description: "Military fortresses, command post.",
         guilds: ["Boros"],
         guildColors: [["R", "W"]],
@@ -446,7 +446,7 @@ async function generateEncounter() {
     // Formata lista de criaturas
     const creaturesHTML = encounterCreatures.map(c => `
         <div style="background: rgba(102, 126, 234, 0.1); padding: 12px; margin: 8px 0; border-left: 3px solid #667eea; border-radius: 4px;">
-            <strong style="color: #667eea;">⚔️ ${c.name}</strong>
+            <strong style="color: #667eea;">${c.name}</strong>
             <div style="font-size: 0.9em; color: #aaa; margin-top: 4px;">
                 CR ${c.cr} (${c.xp} XP) • ${c.challenge}
             </div>
@@ -464,12 +464,12 @@ async function generateEncounter() {
         </div>
 
         <div style="background: rgba(102, 126, 234, 0.15); border-radius: 4px; padding: 15px; margin: 15px 0; border-left: 4px solid #667eea;">
-            <strong style="color: #667eea; font-size: 1.1em;">⚔️ Encounter Creatures:</strong>
+            <strong style="color: #667eea; font-size: 1.1em;">Encounter Creatures:</strong>
             ${creaturesHTML}
         </div>
 
         <div style="background: rgba(0, 0, 0, 0.3); border-radius: 4px; padding: 15px; margin: 15px 0; border-left: 3px solid #764ba2;">
-            <strong style="color: #764ba2;">📊 Statistics:</strong>
+            <strong style="color: #764ba2;">Statistics:</strong>
             <p style="margin: 10px 0 0 0; color: #aaa;">
                 • Raw XP: ${totalXP} | Adjusted XP (${partySize} PCs): ${adjustedXP.toFixed(0)}<br>
                 • Threshold ${difficulty.toUpperCase()}: ${targetXP} XP<br>
@@ -482,7 +482,7 @@ async function generateEncounter() {
                 ${difficulty.toUpperCase()}: ${formatDifficulty(difficulty)}
             </span>
             <span style="color: #aaa;">
-                | 👥 ${partySize} PCs | ⚔️ Nível ${partyLevel}
+                | ${partySize} PCs | Level ${partyLevel}
             </span>
         </div>
 
@@ -506,7 +506,7 @@ async function generateEncounter() {
     `;
 
     // Atualiza UI
-    document.getElementById("encounterTitle").textContent = `⚔️ Encontro em ${environment.name}`;
+    document.getElementById("encounterTitle").textContent = `Encounter in ${environment.name}`;
     document.getElementById("encounterContent").innerHTML = html;
     document.getElementById("encounterResult").classList.add("visible");
 

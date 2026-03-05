@@ -3,87 +3,87 @@
 
 let CREATURES_DATABASE = null;
 
-// Environment and thematic encounter data
+// Dados de ambientes e encontros temáticos
 const ENVIRONMENTS = {
     azorius: {
-        name: "Azorius Administrative District",
+        name: "Distrito Administrativo Azorius",
         icon: "🏛️",
-        description: "Government complexes, courts, infinite archives.",
+        description: "Complexos governamentais, tribunais, arquivos infinitos.",
         guilds: ["Azorius"],
         guildColors: [["W", "U"]],
-        threat: "Audit, imprisonment, or asset seizure.",
+        threat: "Auditoria, prisão ou confisco de bens.",
     },
     orzhov: {
-        name: "Orzhov Cathedral",
+        name: "Catedral Orzhov",
         icon: "⛪",
-        description: "Luxurious basilicas that are banks, churches, and vaults.",
+        description: "Basílicas luxuosas que são bancos, igrejas e cofres.",
         guilds: ["Orzhov"],
         guildColors: [["W", "B"]],
-        threat: "Debt collection, binding contracts.",
+        threat: "Cobrança de dívidas, contratos vinculativos.",
     },
     izzet: {
-        name: "Izzet Laboratory",
+        name: "Laboratório Izzet",
         icon: "🧪",
-        description: "Unstable and dangerous experimental towers.",
+        description: "Torres experimentais instáveis e perigosas.",
         guilds: ["Izzet"],
         guildColors: [["U", "R"]],
-        threat: "Experiments spiraling disastrously out of control.",
+        threat: "Experimentos fora de controle desastrosamente.",
     },
     rakdos: {
-        name: "Rakdos Arena",
+        name: "Arena Rakdos",
         icon: "🎭",
-        description: "Theater, circus, ritual massacre.",
+        description: "Teatro, circo, massacre ritual.",
         guilds: ["Rakdos"],
         guildColors: [["B", "R"]],
-        threat: "Chaos, sadistic performance, bloodshed.",
+        threat: "Caos, performance sádica, derramamento de sangue.",
     },
     selesnya: {
-        name: "Selesnya Garden",
+        name: "Jardim Selesnya",
         icon: "🌳",
-        description: "Living oases within the city.",
+        description: "Oásis vivos dentro da cidade.",
         guilds: ["Selesnya"],
         guildColors: [["G", "W"]],
-        threat: "Forced incorporation, communion ritual.",
+        threat: "Incorporação forçada, ritual de comunhão.",
     },
     golgari: {
-        name: "Golgari Catacombs",
+        name: "Subterrâneos Golgari",
         icon: "☠️",
-        description: "Necropolises, fungi, undead-living ecosystem.",
+        description: "Necrópoles, fungos, ecossistema morto-vivo.",
         guilds: ["Golgari"],
         guildColors: [["B", "G"]],
-        threat: "Necrophagous swarms, the undead awaken.",
+        threat: "Enxame necrofágico, os mortos-vivos despertam.",
     },
     simic: {
-        name: "Simic Zones",
+        name: "Zonas Simic",
         icon: "🧬",
-        description: "Biological reserves and mutation chambers.",
+        description: "Reservas biológicas e câmaras de mutação.",
         guilds: ["Simic"],
         guildColors: [["U", "G"]],
-        threat: "Unstable hybrids and accelerated evolution.",
+        threat: "Híbridos instáveis e evolução acelerada.",
     },
     gruul: {
-        name: "Gruul Territory",
+        name: "Territorium Gruul",
         icon: "🪨",
-        description: "Destroyed forests, ancient ruins, savagery.",
+        description: "Florestas destruídas, ruínas antigas, selvageria.",
         guilds: ["Gruul"],
         guildColors: [["G", "R"]],
-        threat: "Brute fury, wild beast, destruction.",
+        threat: "Fúria bruta, besta selvagem, destruição.",
     },
     boros: {
-        name: "Boros Garrison",
+        name: "Quartel Boros",
         icon: "",
-        description: "Military fortresses, command post.",
+        description: "Fortalezas militares, posto de comando.",
         guilds: ["Boros"],
         guildColors: [["R", "W"]],
-        threat: "Brutal enforcement of martial law.",
+        threat: "Aplicação brutal da lei marcial.",
     },
     dimir: {
-        name: "Dimir Cell",
+        name: "Célula Dimir",
         icon: "🕵️",
-        description: "Hidden spaces, forbidden libraries.",
+        description: "Espaços ocultos, bibliotecas proibidas.",
         guilds: ["Dimir"],
         guildColors: [["U", "B"]],
-        threat: "Infiltration, secret assassination, stolen memories.",
+        threat: "Infiltração, assassinato secreto, memórias roubadas.",
     }
 };
 
@@ -205,7 +205,7 @@ async function loadCreatures() {
     if (CREATURES_DATABASE) return CREATURES_DATABASE;
     
     try {
-        const response = await fetch('../data/output/final.json');
+        const response = await fetch('./final.json');
         CREATURES_DATABASE = await response.json();
         return CREATURES_DATABASE;
     } catch (error) {
@@ -416,7 +416,7 @@ async function generateEncounter() {
     const difficultySelect = document.getElementById("difficulty").value;
 
     if (!envSelect.value || envSelect.value === "") {
-        alert("Please select an environment!");
+        alert("Por favor, selecione um ambiente!");
         return;
     }
 
@@ -464,16 +464,16 @@ async function generateEncounter() {
         </div>
 
         <div style="background: rgba(102, 126, 234, 0.15); border-radius: 4px; padding: 15px; margin: 15px 0; border-left: 4px solid #667eea;">
-            <strong style="color: #667eea; font-size: 1.1em;">Encounter Creatures:</strong>
+            <strong style="color: #667eea; font-size: 1.1em;">Criaturas do Encontro:</strong>
             ${creaturesHTML}
         </div>
 
         <div style="background: rgba(0, 0, 0, 0.3); border-radius: 4px; padding: 15px; margin: 15px 0; border-left: 3px solid #764ba2;">
-            <strong style="color: #764ba2;">Statistics:</strong>
+            <strong style="color: #764ba2;">Estatísticas:</strong>
             <p style="margin: 10px 0 0 0; color: #aaa;">
-                • Raw XP: ${totalXP} | Adjusted XP (${partySize} PCs): ${adjustedXP.toFixed(0)}<br>
+                • XP Raw: ${totalXP} | XP Ajustado (${partySize} PCs): ${adjustedXP.toFixed(0)}<br>
                 • Threshold ${difficulty.toUpperCase()}: ${targetXP} XP<br>
-                • Threat: <em>${environment.threat}</em>
+                • Ameaça: <em>${environment.threat}</em>
             </p>
         </div>
 
@@ -516,9 +516,9 @@ async function generateEncounter() {
     }, 100);
 }
 
-// Opens creatures tab
+// Abre aba de criaturas
 function openCreaturesTab() {
-    window.location.href = "../index.html";
+    window.location.href = "index.html";
 }
 
 // Event listeners
