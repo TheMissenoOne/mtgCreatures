@@ -43,7 +43,7 @@ function elementClass(contentNode) {
 }
 // Inline extraction END
 
-fetch('src/templates/abilities-block.html')
+fetch('/src/templates/abilities-block.html')
   .then(stream => stream.text())
   .then(htmlContent => {
     let contentNode =
