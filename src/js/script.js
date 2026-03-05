@@ -4,7 +4,7 @@ window.onload = function () {
     const url = new URL(url_string);
     const cardName = url.searchParams.get("card");
     
-    fetch("../../data/output/final.json")
+    fetch("data/output/final.json")
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();
