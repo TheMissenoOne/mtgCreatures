@@ -1,0 +1,13 @@
+# GitHub Pages Jekyll Configuration
+theme: null
+markdown: kramdown
+exclude:
+  - .git
+  - .gitignore
+  - backend/
+  - scripts/
+  - ORGANIZATION_COMPLETE.md
+  - STRUCTURE.md
+
+# Ensure GitHub Pages serves from docs/ folder
+# This config file is required even when using a custom theme: null

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>MTG Creatures - D&D 5e Stat Blocks</title>
+    <meta name="description" content="Browse and view D&D 5e stat blocks generated from Magic: The Gathering creatures" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+    <link href="//fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+    <link href="//fonts.googleapis.com/css?family=Libre+Baskerville:700" rel="stylesheet" type="text/css" />
+    <link href="src/styles/style.css" rel="stylesheet" type="text/css" />
+
+    <script type="module" src="src/js/stat-block.js"></script>
+    <script type="module" src="src/js/creature-heading.js"></script>
+    <script type="module" src="src/js/top-stats.js"></script>
+    <script type="module" src="src/js/abilities-block.js"></script>
+    <script type="module" src="src/js/property-line.js"></script>
+    <script type="module" src="src/js/property-block.js"></script>
+    <script type="module" src="src/js/tapered-rule.js"></script>
+
+    <style>
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        font-family: 'Noto Sans', sans-serif;
+        background: #000;
+        
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 16px;
+        text-align: center;
+        flex-shrink: 0;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .header h1 {
+        margin: 0;
+        font-size: 1.8em;
+        line-height: 1.2;
+      }
+      
+      .header p {
+        margin: 4px 0 0 0;
+        font-size: 0.85em;
+        opacity: 0.9;
+      }
+      
+      .nav-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85em;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+      }
+      
+      .nav-btn:active {
+        background: rgba(255, 255, 255, 0.35);
+        transform: scale(0.95);
+      }
+      
+      
+      .container {
+        display: flex;
+        flex-direction: row;
+        height: calc(100vh - 70px);
+        gap: 0;
+      }
+      
+      .sidebar {
+        overflow: auto;
+        flex: 0 0 320px;
+        background: #f5f5f5;
+        border-right: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+        
+      }
+      
+      .dropdown {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        
+      }
+      
+      .dropbtn {
+        width: 100%;
+        padding: 16px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-bottom: 2px solid #764ba2;
+        cursor: pointer;
+        font-size: 1.05em;
+        font-weight: bold;
+        transition: all 0.2s ease;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 56px;
+        flex-shrink: 0;
+      }
+      
+      .dropbtn:active {
+        background: #764ba2;
+        transform: scale(0.98);
+      }
+      
+      .dropdown-content {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        display: none;
+        background: white;
+        width: 100%;
+      }
+      
+      .dropdown-content.show {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .dropdown-content input {
+        width: 100%;
+        padding: 14px 16px;
+        border: none;
+        border-bottom: 3px solid #667eea;
+        box-sizing: border-box;
+        font-size: 16px;
+        -webkit-appearance: none;
+        appearance: none;
+        flex-shrink: 0;
+      }
+
+      .dropdown-content input:focus {
+        outline: none;
+        border-bottom-color: #764ba2;
+        background: #f9f9f9;
+      }
+      
+      .dropdown-content a {
+        display: flex;
+        align-items: center;
+        padding: 14px 16px;
+        color: #333;
+        text-decoration: none;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        word-break: break-word;
+        font-size: 1em;
+        line-height: 1.4;
+        min-height: 48px;
+      }
+      
+      .dropdown-content a:active {
+        background: #e0e0ff;
+        color: #667eea;
+        padding-left: 22px;
+      }
+      
+      .main-content {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 0;
+        background: #000;
+        display: flex;
+        flex-direction: column;
+        background-color: #ebe6d1;
+      }
+      
+      #ficha {
+        width: 100%;
+        height: 100%;
+      }
+      
+      .card_art {
+        
+        position: relative;
+        background-size: contain;
+        background-position: right top;
+        width: 100%;
+        height: 100%;
+      }
+      
+      /* Desktop: 1025px+ */
+      @media (min-width: 1025px) {
+        .header h1 { font-size: 2em; }
+        .header p { font-size: 0.9em; }
+        .container { height: calc(100vh - 80px); }
+        .sidebar { flex: 0 0 350px; }
+      }
+      
+      /* Tablet: 769px - 1024px */
+      @media (max-width: 1024px) and (min-width: 769px) {
+        .sidebar { flex: 0 0 280px; }
+      }
+      
+      /* Mobile: Below 768px */
+      @media (max-width: 768px) {
+
+        #stat-block {
+          padding-top: 256px;
+        }
+        .header {
+          padding: 10px 12px;
+        }
+        
+        .header h1 {
+          font-size: 1.4em;
+          margin: 0;
+        }
+        
+        .header p {
+          font-size: 0.75em;
+          margin: 2px 0 0 0;
+        }
+        
+        .container {
+          flex-direction: column;
+          height: calc(100vh - 55px);
+        }
+        
+        .sidebar {
+          flex: 0 0 auto;
+          border-right: none;
+          border-bottom: 2px solid #ddd;
+        }
+        
+        .dropbtn {
+          min-height: 52px;
+          padding: 14px;
+          font-size: 1em;
+        }
+        
+        .dropdown-content a {
+          min-height: 48px;
+          padding: 12px 14px;
+        }
+        
+        .dropdown-content input {
+          padding: 12px 14px;
+          min-height: 48px;
+        }
+        
+        .main-content {
+          flex: 1;
+          height: auto;
+        }
+      }
+      
+      /* Small phones: Below 480px */
+      @media (max-width: 480px) {
+        .header {
+          padding: 8px 10px;
+        }
+        
+        .header h1 {
+          font-size: 1.2em;
+          margin: 0;
+        }
+        
+        .header p {
+          font-size: 0.65em;
+          margin: 2px 0 0 0;
+        }
+        
+        .container {
+          height: calc(100vh - 48px);
+        }
+        
+        .dropbtn {
+          min-height: 48px;
+          padding: 12px;
+          font-size: 0.95em;
+          gap: 8px;
+        }
+        
+        .sidebar {
+          height: auto;
+        }
+        
+        .main-content {
+          height: auto;
+        }
+      }
+      
+      /* Landscape: max-height 600px */
+      @media (max-height: 600px) and (orientation: landscape) {
+        .header {
+          padding: 6px 12px;
+        }
+        
+        .header h1 {
+          font-size: 1.1em; 
+          margin: 0;
+        }
+        
+        .header p {
+          display: none;
+        }
+        
+        .container {
+          height: calc(100vh - 40px);
+          flex-direction: row;
+        }
+        
+        .sidebar {
+          flex: 0 0 35%;
+          border-right: 1px solid #ddd;
+          border-bottom: none;
+        }
+        
+        .dropbtn {
+          min-height: 40px;
+          padding: 8px 12px;
+          font-size: 0.9em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>MTG Creatures</h1>
+      <p>D&D 5e Stat Blocks from Magic: The Gathering</p>
+      <button class="nav-btn" onclick="window.location.href='src/encounters.html'" title="Generate random encounters">🎲 Random Encounters</button>
+    </div>
+    
+    <div class="container">
+      <div class="sidebar">
+        <div class="dropdown">
+          <button id="dropdownbtn" class="dropbtn">Select a Creature</button>
+          <div id="cards" class="dropdown-content">
+            <input type="text" placeholder="Search creatures..." id="myInput" onkeyup="filterFunction()" />
+          </div>
+        </div>
+      </div>
+      
+      <div class="main-content">
+        <div id="ficha"></div>
+      </div>
+    </div>
+
+    <script src="src/js/script.js"></script>
+  </body>
+</html>
