@@ -2,7 +2,7 @@
 
 import math
 from fractions import Fraction
-from typing import Dict, Any
+from typing import Any, Dict, List
 
 from config import ATTRIBUTES, CHALLENGE_RATINGS
 
@@ -279,25 +279,34 @@ class StatBlockCalculator:
 
     @staticmethod
     def calculate_ravnica_card_cr(
-        rarity_multiplier: float, cmc: float, power_toughness: float
+        rarity_multiplier: float,
+        cmc: float,
+        power_toughness: float,
+        keyword_count: int = 0,
     ) -> int:
-        """
-        Calculate Challenge Rating for a Ravnica card.
-        
+        """Calculate Challenge Rating for a Ravnica card.
+
+        Formula: log(rarity * PT / CMC) + CMC, with a keyword bonus (max +2).
+
         Args:
-            rarity_multiplier: Card rarity value
-            cmc: Converted mana cost
-            power_toughness: Sum of power and toughness
-            
+            rarity_multiplier: Card rarity multiplier from RARITY_MULTIPLIERS.
+            cmc: Converted mana cost.
+            power_toughness: Sum of power and toughness.
+            keyword_count: Number of recognized D&D keywords on the card.
+
         Returns:
-            Calculated CR as integer
+            Calculated CR as integer, minimum 0.
         """
-        if power_toughness <= 0 or cmc <= 0:
+        if power_toughness <= 0:
             return 0
 
+        effective_cmc = max(1.0, cmc)  # guard against CMC=0
+
         try:
-            cr = math.log(rarity_multiplier / (cmc / power_toughness)) + cmc
-            return max(0, int(round(cr)))
+            base_cr = math.log(rarity_multiplier / (effective_cmc / power_toughness)) + effective_cmc
+            # Each keyword implies added mechanical complexity (~0.3 CR), capped at +2
+            kw_bonus = min(2.0, keyword_count * 0.3)
+            return max(0, int(round(base_cr + kw_bonus)))
         except (ValueError, ZeroDivisionError):
             return 0
 
