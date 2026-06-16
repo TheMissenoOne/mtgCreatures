@@ -1,9 +1,17 @@
 import {createCustomElement} from './helpers/create-custom-element.js';
 
-fetch('/src/templates/property-block.html')
-  .then(stream => stream.text())
-  .then(htmlContent => {
-    let contentNode =
-      document.createRange().createContextualFragment(htmlContent);
-    createCustomElement('property-block', contentNode);
-  });
+const HTML = `<style>
+  :host {
+    margin-top: 0.3em;
+    margin-bottom: 0.9em;
+    line-height: 1.5;
+    display: block;
+  }
+  ::slotted(h4) { margin: 0; display: inline; font-weight: normal; font-style: italic; }
+  ::slotted(p:first-of-type) { display: inline; text-indent: 0; }
+  ::slotted(p) { text-indent: 1em; margin: 0; }
+</style>
+<slot></slot>`;
+
+const contentNode = document.createRange().createContextualFragment(HTML);
+createCustomElement('property-block', contentNode);

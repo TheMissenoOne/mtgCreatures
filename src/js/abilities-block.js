@@ -1,52 +1,48 @@
 import {createCustomElement} from './helpers/create-custom-element.js';
 import './tapered-rule.js';
 
-// Inline extraction START
-function abilityModifier(abilityScore) {
-  let score = parseInt(abilityScore, 10);
-  return Math.floor((score - 10) / 2);
+function abilityModifier(score) {
+  return Math.floor((parseInt(score, 10) - 10) / 2);
 }
 
-function formattedModifier(abilityModifier) {
-  if (abilityModifier >= 0) {
-    return '+' + abilityModifier;
-  }
-  // This is an en dash, NOT a "normal" dash. The minus sign needs to be more
-  // visible.
-  return '–' + Math.abs(abilityModifier);
+function formattedModifier(mod) {
+  return mod >= 0 ? '+' + mod : '–' + Math.abs(mod);
 }
 
-function abilityText(abilityScore) {
-  return [String(abilityScore),
-          ' (',
-          formattedModifier(abilityModifier(abilityScore)),
-          ')'].join('');
+function abilityText(score) {
+  return `${score} (${formattedModifier(abilityModifier(score))})`;
 }
 
 function elementClass(contentNode) {
   return class extends HTMLElement {
     constructor() {
       super();
-      this.attachShadow({mode: 'open'})
-        .appendChild(contentNode.cloneNode(true));
+      this.attachShadow({mode: 'open'}).appendChild(contentNode.cloneNode(true));
     }
     connectedCallback() {
-      let root = this.shadowRoot;
-      for (let i = 0; i < this.attributes.length; i++) {
-        let attribute = this.attributes[i];
-        let abilityShortName = attribute.name.split('-')[1];
-        root.getElementById(abilityShortName).textContent =
-           abilityText(attribute.value);
+      const root = this.shadowRoot;
+      for (const attr of this.attributes) {
+        const id = attr.name.split('-')[1];
+        const el = root.getElementById(id);
+        if (el) el.textContent = abilityText(attr.value);
       }
     }
-  }
+  };
 }
-// Inline extraction END
 
-fetch('/src/templates/abilities-block.html')
-  .then(stream => stream.text())
-  .then(htmlContent => {
-    let contentNode =
-      document.createRange().createContextualFragment(htmlContent);
-    createCustomElement('abilities-block', contentNode, elementClass);
-  });
+const HTML = `<style>
+  table { width: 100%; border: 0; border-collapse: collapse; }
+  th, td { width: 50px; text-align: center; }
+</style>
+<tapered-rule></tapered-rule>
+<table>
+  <tr><th>STR</th><th>DEX</th><th>CON</th><th>INT</th><th>WIS</th><th>CHA</th></tr>
+  <tr>
+    <td id="str"></td><td id="dex"></td><td id="con"></td>
+    <td id="int"></td><td id="wis"></td><td id="cha"></td>
+  </tr>
+</table>
+<tapered-rule></tapered-rule>`;
+
+const contentNode = document.createRange().createContextualFragment(HTML);
+createCustomElement('abilities-block', contentNode, elementClass);

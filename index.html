@@ -1,373 +1,286 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>MTG Creatures - D&D 5e Stat Blocks</title>
-    <meta name="description" content="Browse and view D&D 5e stat blocks generated from Magic: The Gathering creatures" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>MTG Creatures — D&D 5e Stat Blocks</title>
+  <meta name="description" content="Browse D&D 5e stat blocks generated from Magic: The Gathering Ravnica creatures" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet" />
+  <script type="module" src="src/js/stat-block.js"></script>
+  <script type="module" src="src/js/creature-heading.js"></script>
+  <script type="module" src="src/js/top-stats.js"></script>
+  <script type="module" src="src/js/abilities-block.js"></script>
+  <script type="module" src="src/js/property-line.js"></script>
+  <script type="module" src="src/js/property-block.js"></script>
+  <script type="module" src="src/js/tapered-rule.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-    <link href="//fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
-    <link href="//fonts.googleapis.com/css?family=Libre+Baskerville:700" rel="stylesheet" type="text/css" />
-    <link href="src/styles/style.css" rel="stylesheet" type="text/css" />
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      font-family: 'Noto Sans', sans-serif;
+      background: #1a1a2e; color: #eee;
+    }
 
-    <script type="module" src="src/js/stat-block.js"></script>
-    <script type="module" src="src/js/creature-heading.js"></script>
-    <script type="module" src="src/js/top-stats.js"></script>
-    <script type="module" src="src/js/abilities-block.js"></script>
-    <script type="module" src="src/js/property-line.js"></script>
-    <script type="module" src="src/js/property-block.js"></script>
-    <script type="module" src="src/js/tapered-rule.js"></script>
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white; padding: 10px 16px;
+      display: flex; align-items: center; gap: 12px;
+      flex-shrink: 0; z-index: 100; flex-wrap: wrap;
+    }
+    .header h1 { margin: 0; font-size: 1.4em; flex: 1; }
+    .nav-btn {
+      background: rgba(255,255,255,0.2); color: white;
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 7px 14px; border-radius: 4px;
+      cursor: pointer; font-size: 0.85em; font-weight: 600;
+      transition: background 0.2s; white-space: nowrap;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.35); }
+    .count-badge {
+      background: rgba(255,255,255,0.15);
+      padding: 3px 8px; border-radius: 10px;
+      font-size: 0.8em; opacity: 0.9;
+    }
 
-    <style>
-      * {
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-        -webkit-touch-callout: none;
-      }
+    /* ── Layout ── */
+    .container {
+      display: flex; flex-direction: row;
+      height: calc(100vh - 46px); gap: 0;
+    }
 
-      html, body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        width: 100%;
-        font-family: 'Noto Sans', sans-serif;
-        background: #000;
-        
-        -webkit-user-select: none;
-        user-select: none;
-      }
-      
-      .header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 12px 16px;
-        text-align: center;
-        flex-shrink: 0;
-        z-index: 100;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-      }
-      
-      .header h1 {
-        margin: 0;
-        font-size: 1.8em;
-        line-height: 1.2;
-      }
-      
-      .header p {
-        margin: 4px 0 0 0;
-        font-size: 0.85em;
-        opacity: 0.9;
-      }
-      
-      .nav-btn {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        padding: 8px 16px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 0.85em;
-        font-weight: 600;
-        transition: all 0.2s ease;
-        white-space: nowrap;
-      }
-      
-      .nav-btn:active {
-        background: rgba(255, 255, 255, 0.35);
-        transform: scale(0.95);
-      }
-      
-      
-      .container {
-        display: flex;
-        flex-direction: row;
-        height: calc(100vh - 70px);
-        gap: 0;
-      }
-      
-      .sidebar {
-        overflow: auto;
-        flex: 0 0 320px;
-        background: #f5f5f5;
-        border-right: 1px solid #ddd;
-        display: flex;
-        flex-direction: column;
-        
-      }
-      
-      .dropdown {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        
-      }
-      
-      .dropbtn {
-        width: 100%;
-        padding: 16px;
-        background: #667eea;
-        color: white;
-        border: none;
-        border-bottom: 2px solid #764ba2;
-        cursor: pointer;
-        font-size: 1.05em;
-        font-weight: bold;
-        transition: all 0.2s ease;
-        text-align: left;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-height: 56px;
-        flex-shrink: 0;
-      }
-      
-      .dropbtn:active {
-        background: #764ba2;
-        transform: scale(0.98);
-      }
-      
-      .dropdown-content {
-        flex: 1;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        display: none;
-        background: white;
-        width: 100%;
-      }
-      
-      .dropdown-content.show {
-        display: flex;
-        flex-direction: column;
-      }
-      
-      .dropdown-content input {
-        width: 100%;
-        padding: 14px 16px;
-        border: none;
-        border-bottom: 3px solid #667eea;
-        box-sizing: border-box;
-        font-size: 16px;
-        -webkit-appearance: none;
-        appearance: none;
-        flex-shrink: 0;
-      }
+    /* ── Sidebar ── */
+    .sidebar {
+      flex: 0 0 300px; background: #16213e;
+      border-right: 1px solid #2d3561;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
 
-      .dropdown-content input:focus {
-        outline: none;
-        border-bottom-color: #764ba2;
-        background: #f9f9f9;
-      }
-      
-      .dropdown-content a {
-        display: flex;
-        align-items: center;
-        padding: 14px 16px;
-        color: #333;
-        text-decoration: none;
-        border-bottom: 1px solid #eee;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        word-break: break-word;
-        font-size: 1em;
-        line-height: 1.4;
-        min-height: 48px;
-      }
-      
-      .dropdown-content a:active {
-        background: #e0e0ff;
-        color: #667eea;
-        padding-left: 22px;
-      }
-      
-      .main-content {
-        flex: 1;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        padding: 0;
-        background: #000;
-        display: flex;
-        flex-direction: column;
-        background-color: #ebe6d1;
-      }
-      
-      #ficha {
-        width: 100%;
-        height: 100%;
-      }
-      
-      .card_art {
-        
-        position: relative;
-        background-size: contain;
-        background-position: right top;
-        width: 100%;
-        height: 100%;
-      }
-      
-      /* Desktop: 1025px+ */
-      @media (min-width: 1025px) {
-        .header h1 { font-size: 2em; }
-        .header p { font-size: 0.9em; }
-        .container { height: calc(100vh - 80px); }
-        .sidebar { flex: 0 0 350px; }
-      }
-      
-      /* Tablet: 769px - 1024px */
-      @media (max-width: 1024px) and (min-width: 769px) {
-        .sidebar { flex: 0 0 280px; }
-      }
-      
-      /* Mobile: Below 768px */
-      @media (max-width: 768px) {
+    /* ── Filters ── */
+    .filters {
+      flex-shrink: 0; padding: 10px;
+      border-bottom: 1px solid #2d3561;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .search-box {
+      width: 100%; padding: 9px 12px;
+      background: #0f3460; border: 1px solid #3d5af1;
+      border-radius: 4px; color: #eee; font-size: 0.95em;
+      outline: none;
+    }
+    .search-box::placeholder { color: #888; }
+    .search-box:focus { border-color: #667eea; }
 
-        #stat-block {
-          padding-top: 256px;
-        }
-        .header {
-          padding: 10px 12px;
-        }
-        
-        .header h1 {
-          font-size: 1.4em;
-          margin: 0;
-        }
-        
-        .header p {
-          font-size: 0.75em;
-          margin: 2px 0 0 0;
-        }
-        
-        .container {
-          flex-direction: column;
-          height: calc(100vh - 55px);
-        }
-        
-        .sidebar {
-          flex: 0 0 auto;
-          border-right: none;
-          border-bottom: 2px solid #ddd;
-        }
-        
-        .dropbtn {
-          min-height: 52px;
-          padding: 14px;
-          font-size: 1em;
-        }
-        
-        .dropdown-content a {
-          min-height: 48px;
-          padding: 12px 14px;
-        }
-        
-        .dropdown-content input {
-          padding: 12px 14px;
-          min-height: 48px;
-        }
-        
-        .main-content {
-          flex: 1;
-          height: auto;
-        }
-      }
-      
-      /* Small phones: Below 480px */
-      @media (max-width: 480px) {
-        .header {
-          padding: 8px 10px;
-        }
-        
-        .header h1 {
-          font-size: 1.2em;
-          margin: 0;
-        }
-        
-        .header p {
-          font-size: 0.65em;
-          margin: 2px 0 0 0;
-        }
-        
-        .container {
-          height: calc(100vh - 48px);
-        }
-        
-        .dropbtn {
-          min-height: 48px;
-          padding: 12px;
-          font-size: 0.95em;
-          gap: 8px;
-        }
-        
-        .sidebar {
-          height: auto;
-        }
-        
-        .main-content {
-          height: auto;
-        }
-      }
-      
-      /* Landscape: max-height 600px */
-      @media (max-height: 600px) and (orientation: landscape) {
-        .header {
-          padding: 6px 12px;
-        }
-        
-        .header h1 {
-          font-size: 1.1em; 
-          margin: 0;
-        }
-        
-        .header p {
-          display: none;
-        }
-        
-        .container {
-          height: calc(100vh - 40px);
-          flex-direction: row;
-        }
-        
-        .sidebar {
-          flex: 0 0 35%;
-          border-right: 1px solid #ddd;
-          border-bottom: none;
-        }
-        
-        .dropbtn {
-          min-height: 40px;
-          padding: 8px 12px;
-          font-size: 0.9em;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="header">
-      <h1>MTG Creatures</h1>
-      <p>D&D 5e Stat Blocks from Magic: The Gathering</p>
-      <button class="nav-btn" onclick="window.location.href='src/encounters.html'" title="Generate random encounters">🎲 Random Encounters</button>
-    </div>
-    
-    <div class="container">
-      <div class="sidebar">
-        <div class="dropdown">
-          <button id="dropdownbtn" class="dropbtn">Select a Creature</button>
-          <div id="cards" class="dropdown-content">
-            <input type="text" placeholder="Search creatures..." id="myInput" onkeyup="filterFunction()" />
+    .filter-row {
+      display: flex; gap: 6px; align-items: center;
+      flex-wrap: wrap;
+    }
+    .filter-label { font-size: 0.75em; color: #888; white-space: nowrap; }
+
+    .filter-select {
+      flex: 1; padding: 5px 8px;
+      background: #0f3460; border: 1px solid #3d5af1;
+      border-radius: 4px; color: #eee; font-size: 0.82em;
+      outline: none; cursor: pointer; min-width: 80px;
+    }
+    .cr-input {
+      width: 46px; padding: 5px 6px;
+      background: #0f3460; border: 1px solid #3d5af1;
+      border-radius: 4px; color: #eee; font-size: 0.82em;
+      text-align: center; outline: none;
+    }
+    .cr-sep { color: #666; font-size: 0.85em; }
+
+    /* MTG color filter buttons */
+    .color-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+    .color-btn {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 2px solid transparent; cursor: pointer;
+      font-size: 0.7em; font-weight: 900; transition: all 0.15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .color-btn.active { border-color: white; transform: scale(1.15); }
+    .color-btn.c-W  { background: #f9faf4; color: #333; }
+    .color-btn.c-U  { background: #0e68ab; color: white; }
+    .color-btn.c-B  { background: #150b00; color: #ccc; border-color: #555; }
+    .color-btn.c-R  { background: #d3202a; color: white; }
+    .color-btn.c-G  { background: #00733e; color: white; }
+    .color-btn.c-all { background: #333; color: #eee; border-radius: 4px;
+                       width: auto; padding: 0 8px; font-size: 0.72em; }
+
+    /* ── Creature list ── */
+    .creature-list {
+      flex: 1; overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .creature-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 12px; cursor: pointer;
+      border-bottom: 1px solid #1e2a4a;
+      transition: background 0.12s; user-select: none;
+    }
+    .creature-item:hover { background: #1e2a4a; }
+    .creature-item.active { background: #2d3561; border-left: 3px solid #667eea; }
+    .creature-name { flex: 1; font-size: 0.9em; line-height: 1.3; }
+    .cr-tag {
+      font-size: 0.72em; background: #0f3460;
+      padding: 2px 6px; border-radius: 3px;
+      color: #aaa; white-space: nowrap; flex-shrink: 0;
+    }
+    .rarity-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .rarity-dot.common   { background: #888; }
+    .rarity-dot.uncommon { background: #a8c4d4; }
+    .rarity-dot.rare     { background: #d4af37; }
+    .rarity-dot.mythic   { background: #e8642c; }
+
+    .no-results {
+      padding: 20px; text-align: center; color: #555; font-size: 0.9em;
+    }
+
+    /* ── Main content ── */
+    .main-content {
+      flex: 1; overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #ebe6d1; display: flex;
+      flex-direction: column; align-items: center;
+    }
+
+    .welcome-msg {
+      margin: 40px auto; max-width: 480px; text-align: center;
+      padding: 30px; color: #555;
+    }
+    .welcome-msg h2 { color: #7A200D; margin-bottom: 10px; }
+
+    /* ── Creature display ── */
+    .creature-display { width: 100%; max-width: 900px; padding: 16px; }
+
+    /* Card art banner */
+    .card-art-banner {
+      width: 100%; height: 220px;
+      background-size: cover; background-position: center 20%;
+      border-radius: 4px 4px 0 0; position: relative;
+      overflow: hidden;
+    }
+    .card-art-banner::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 50%, #FDF1DC 100%);
+    }
+
+    /* MTG info bar */
+    .mtg-info-bar {
+      background: #FDF1DC; padding: 8px 12px;
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: wrap; border-bottom: 1px solid #d8c9a0;
+      font-size: 0.82em;
+    }
+    .rarity-badge {
+      padding: 2px 8px; border-radius: 3px;
+      font-weight: 700; text-transform: capitalize; font-size: 0.9em;
+    }
+    .rarity-badge.common   { background: #ddd; color: #444; }
+    .rarity-badge.uncommon { background: #a8c4d4; color: #12344d; }
+    .rarity-badge.rare     { background: #d4af37; color: #3a2a00; }
+    .rarity-badge.mythic   { background: #e8642c; color: #fff; }
+
+    .info-pill {
+      background: #e8dfc0; color: #6b5c3e;
+      padding: 2px 8px; border-radius: 3px; font-size: 0.9em;
+    }
+    .mana-symbol {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%;
+      font-size: 0.72em; font-weight: 900; border: 1px solid rgba(0,0,0,0.2);
+      vertical-align: middle; margin: 0 1px;
+    }
+    .mana-w { background: #f9faf4; color: #333; }
+    .mana-u { background: #0e68ab; color: white; }
+    .mana-b { background: #150b00; color: #ccc; }
+    .mana-r { background: #d3202a; color: white; }
+    .mana-g { background: #00733e; color: white; }
+
+    .type-line-bar {
+      background: #f5efd5; padding: 5px 12px;
+      font-size: 0.82em; color: #6b5c3e; font-style: italic;
+      border-bottom: 1px solid #d8c9a0;
+    }
+    .flavor-bar {
+      background: #f0e9d2; padding: 8px 14px;
+      font-size: 0.82em; color: #7a6a4a; font-style: italic;
+      border-top: 1px solid #d8c9a0; line-height: 1.5;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .container { flex-direction: column; height: calc(100vh - 46px); }
+      .sidebar { flex: 0 0 auto; border-right: none; border-bottom: 1px solid #2d3561; max-height: 45vh; }
+      .creature-list { max-height: 200px; }
+      .card-art-banner { height: 160px; }
+    }
+    @media (min-width: 1200px) {
+      .sidebar { flex: 0 0 320px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>MTG Creatures</h1>
+    <span class="count-badge" id="countBadge">Loading…</span>
+    <button class="nav-btn" onclick="window.location.href='src/encounters.html'">🎲 Encounters</button>
+  </div>
+
+  <div class="container">
+    <div class="sidebar">
+      <div class="filters">
+        <input class="search-box" type="text" placeholder="Search by name…" id="searchInput" autocomplete="off" />
+
+        <div class="filter-row">
+          <span class="filter-label">CR</span>
+          <input class="cr-input" type="number" id="crMin" min="0" max="30" value="0" title="Min CR" />
+          <span class="cr-sep">–</span>
+          <input class="cr-input" type="number" id="crMax" min="0" max="30" value="30" title="Max CR" />
+          <select class="filter-select" id="rarityFilter">
+            <option value="">All rarities</option>
+            <option value="common">Common</option>
+            <option value="uncommon">Uncommon</option>
+            <option value="rare">Rare</option>
+            <option value="mythic">Mythic</option>
+          </select>
+        </div>
+
+        <div class="filter-row">
+          <span class="filter-label">Color</span>
+          <div class="color-btns">
+            <button class="color-btn c-W" data-color="W" title="White">W</button>
+            <button class="color-btn c-U" data-color="U" title="Blue">U</button>
+            <button class="color-btn c-B" data-color="B" title="Black">B</button>
+            <button class="color-btn c-R" data-color="R" title="Red">R</button>
+            <button class="color-btn c-G" data-color="G" title="Green">G</button>
+            <button class="color-btn c-all active" data-color="all" title="All colors">ALL</button>
           </div>
+          <select class="filter-select" id="sortSelect" style="margin-left:auto;">
+            <option value="name">A–Z</option>
+            <option value="cr">CR ↑</option>
+            <option value="cr-desc">CR ↓</option>
+            <option value="rarity">Rarity</option>
+          </select>
         </div>
       </div>
-      
-      <div class="main-content">
-        <div id="ficha"></div>
-      </div>
+
+      <div class="creature-list" id="creatureList"></div>
     </div>
 
-    <script src="src/js/script.js"></script>
-  </body>
+    <div class="main-content" id="mainContent">
+      <div class="welcome-msg">
+        <h2>MTG → D&D 5e</h2>
+        <p>Select a creature from the list to view its D&D stat block, converted from Magic: The Gathering Ravnica cards.</p>
+        <p style="font-size:0.85em; color:#888;">Use the filters to search by name, CR, color, or rarity.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="src/js/script.js"></script>
+</body>
 </html>

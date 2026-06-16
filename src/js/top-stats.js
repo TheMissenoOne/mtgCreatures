@@ -1,10 +1,12 @@
 import {createCustomElement} from './helpers/create-custom-element.js';
 import './tapered-rule.js';
 
-fetch('/src/templates/top-stats.html')
-  .then(stream => stream.text())
-  .then(htmlContent => {
-    let contentNode =
-      document.createRange().createContextualFragment(htmlContent);
-    createCustomElement('top-stats', contentNode);
-  });
+const HTML = `<style>
+  ::slotted(*) { color: #7A200D; }
+</style>
+<tapered-rule></tapered-rule>
+<slot></slot>
+<tapered-rule></tapered-rule>`;
+
+const contentNode = document.createRange().createContextualFragment(HTML);
+createCustomElement('top-stats', contentNode);
