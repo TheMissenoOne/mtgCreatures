@@ -1,7 +1,5 @@
-// Ravnica Encounter Generator - Enhanced with Real Creatures
-// Carrega criaturas de final.json
-
 let CREATURES_DATABASE = null;
+let _encounterCreaturesData = [];
 
 // Environment and thematic encounter data
 const ENVIRONMENTS = {
@@ -108,99 +106,7 @@ const CR_XP_VALUES = {
     27: 105000, 28: 120000, 29: 135000, 30: 155000
 };
 
-// Helper: generate HTML stat block (identical to index's getStatBlock)
-// reused here so encounters can show full creature statblocks.
-const getStatBlock = (data) => {
-    if (!data || typeof data !== 'object') {
-        return '<p style="color: red;">Invalid creature data</p>';
-    }
 
-    const name = data.name || 'Unknown Creature';
-    const meta = data.meta || '';
-    const artUrl = data.image_uris?.art_crop || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23ddd%22 width=%22100%22 height=%22100%22/%3E%3C/svg%3E';
-    const ac = data['Armor Class'] ?? '10';
-    const hp = data['Hit Points'] ?? '10';
-    const speed = data['Speed'] || '30 ft.';
-    const str = data.STR ?? '10';
-    const dex = data.DEX ?? '10';
-    const con = data.CON ?? '10';
-    const int = data.INT ?? '10';
-    const wis = data.WIS ?? '10';
-    const cha = data.CHA ?? '10';
-    const senses = data.Senses || 'Passive Perception 10';
-    const languages = data.Languages || '—';
-    const skills = data.Skills || '—';
-    const challenge = data.Challenge || '0 (0 XP)';
-    const traits = data.Traits || '';
-    const actions = data.Actions || '<p><em>No actions listed</em></p>';
-    const damageImmunities = data['Damage Immunities'] || '';
-    const damageResistances = data['Damage Resistances'] || '';
-    const conditionImmunities = data['Condition Immunities'] || '';
-
-    let immunityBlocks = '';
-    if (damageImmunities) {
-        immunityBlocks += `<property-line><h4>Damage Immunities</h4><p>${damageImmunities}</p></property-line>`;
-    }
-    if (damageResistances) {
-        immunityBlocks += `<property-line><h4>Damage Resistances</h4><p>${damageResistances}</p></property-line>`;
-    }
-    if (conditionImmunities) {
-        immunityBlocks += `<property-line><h4>Condition Immunities</h4><p>${conditionImmunities}</p></property-line>`;
-    }
-
-    return `<div class="card_art" style="background-image: url(${artUrl})"><stat-block id="stat-block">
-    <creature-heading>
-      <h1>${name}</h1>
-      <h2>${meta}</h2>
-    </creature-heading>
-
-    <top-stats>
-      <property-line>
-        <h4>Armor Class</h4>
-        <p>${ac}</p>
-      </property-line>
-      <property-line>
-        <h4>Hit Points</h4>
-        <p>${hp}</p>
-      </property-line>
-      <property-line>
-        <h4>Speed</h4>
-        <p>${speed}</p>
-      </property-line>
-
-      <abilities-block data-str="${str}"
-                       data-dex="${dex}"
-                       data-con="${con}"
-                       data-int="${int}"
-                       data-wis="${wis}"
-                       data-cha="${cha}"></abilities-block>
-
-      ${immunityBlocks}
-      <property-line>
-        <h4>Senses</h4>
-        <p>${senses}</p>
-      </property-line>
-      <property-line>
-        <h4>Languages</h4>
-        <p>${languages}</p>
-      </property-line>
-      <property-line>
-        <h4>Skills</h4>
-        <p>${skills}</p>
-      </property-line>
-      <property-line>
-        <h4>Challenge</h4>
-        <p>${challenge}</p>
-      </property-line>
-    </top-stats>
-
-    ${traits}
-    <h3>Actions</h3>
-    ${actions}
-  </stat-block></div>`;
-};
-
-// Carrega criaturas de final.json
 async function loadCreatures() {
     if (CREATURES_DATABASE) return CREATURES_DATABASE;
     
@@ -209,12 +115,12 @@ async function loadCreatures() {
         CREATURES_DATABASE = await response.json();
         return CREATURES_DATABASE;
     } catch (error) {
-        console.error('Erro carregando creatures:', error);
+        console.error('Error loading creatures:', error);
         return null;
     }
 }
 
-// Converte colors array em guild key, ex: ['W', 'U'] => 'azorius'
+// Convert colors array to guild key: ['W', 'U'] => 'azorius'
 function colorsToGuild(colors) {
     if (!colors || colors.length !== 2) return null;
     
@@ -234,14 +140,14 @@ function colorsToGuild(colors) {
     return colorCombos[sorted];
 }
 
-// Extrai CR numérico de string como "8 (3900 XP)"
+// Extract numeric CR from string like "8 (3900 XP)"
 function parseCR(challengeStr) {
     if (!challengeStr) return 0;
     const match = challengeStr.match(/^([\d/\.]+)/);
     return match ? match[1] : '0';
 }
 
-// Filtra criaturas por guilda e intervalo de CR
+// Filter creatures by guild and CR range
 function filterCreaturesByGuildAndCR(creatures, guildKey, minCR, maxCR) {
     const filtered = [];
     
@@ -255,14 +161,10 @@ function filterCreaturesByGuildAndCR(creatures, guildKey, minCR, maxCR) {
         const colors = creature.colors || [];
         let matches = false;
         
-        // Exact 2-color match for guild
         const creatureGuild = colorsToGuild(colors);
         if (creatureGuild === guildKey) {
             matches = true;
-        }
-        
-        // 1-color creatures matching guild primary color
-        else if (colors.length === 1) {
+        } else if (colors.length === 1) {
             const guildColor = guildMono[guildKey];
             if (colors[0] === guildColor) {
                 matches = true;
@@ -272,7 +174,6 @@ function filterCreaturesByGuildAndCR(creatures, guildKey, minCR, maxCR) {
         if (matches) {
             const cr = parseFloat(parseCR(creature.Challenge));
             if (cr >= minCR && cr <= maxCR) {
-                // include reference to full data so we can render stat block later
                 filtered.push({
                     data: creature,
                     name: creature.name,
@@ -289,7 +190,7 @@ function filterCreaturesByGuildAndCR(creatures, guildKey, minCR, maxCR) {
     return filtered;
 }
 
-// Calcula XP thresholds baseado no nível e tamanho do grupo
+// Calculate XP thresholds by level and party size
 function calculateThresholds(partyLevel, partySize) {
     const xpByLevel = {
         1: { easy: 25, medium: 50, hard: 75, deadly: 100 },
@@ -317,7 +218,7 @@ function calculateThresholds(partyLevel, partySize) {
     };
 }
 
-// Calcula CR necessário para o XP budget
+// Get best CR match for XP budget
 function getCRForBudget(xpBudget) {
     let bestCR = 0;
     let bestDiff = xpBudget;
@@ -333,7 +234,7 @@ function getCRForBudget(xpBudget) {
     return parseFloat(bestCR);
 }
 
-// Seleciona dificuldade aleatória com pesos
+// Select random difficulty with weights
 function selectRandomDifficulty() {
     const difficulties = ["easy", "medium", "hard", "deadly"];
     const weights = [3, 5, 4, 2];
@@ -347,23 +248,20 @@ function selectRandomDifficulty() {
     return "medium";
 }
 
-// Formata dificuldade com estilo
 function formatDifficulty(difficulty) {
     const labels = {
-        easy: "Fácil",
-        medium: "Médio",
-        hard: "Difícil",
-        deadly: "Mortal"
+        easy: "Easy",
+        medium: "Medium",
+        hard: "Hard",
+        deadly: "Deadly"
     };
     return labels[difficulty] || difficulty;
 }
 
-// Seleciona criaturas para construir um encontro
 async function selectCreaturesForEncounter(guildKey, targetXP, partyLevel, difficulty) {
     const creatures = await loadCreatures();
     if (!creatures) return [];
-    
-    // Ajusta intervalo de CR baseado em dificuldade e nível
+
     const crMultiplier = {
         "easy": 0.5,
         "medium": 1,
@@ -378,12 +276,9 @@ async function selectCreaturesForEncounter(guildKey, targetXP, partyLevel, diffi
     
     let availableCreatures = filterCreaturesByGuildAndCR(creatures, guildKey, minCR, maxCR);
     
-    // Se não houver criaturas no intervalo, expandir para toda guilda
     if (availableCreatures.length === 0) {
         availableCreatures = filterCreaturesByGuildAndCR(creatures, guildKey, 0, 30);
     }
-    
-    // Se ainda sem criaturas, usar qualquer guilda com criaturas
     if (availableCreatures.length === 0) {
         const allGuilds = Object.keys(ENVIRONMENTS).filter(k => k !== 'random');
         for (const guild of allGuilds) {
@@ -392,7 +287,6 @@ async function selectCreaturesForEncounter(guildKey, targetXP, partyLevel, diffi
         }
     }
     
-    // Seleciona criaturas para atingir o XP target
     const selected = [];
     let totalXP = 0;
     const shuffled = availableCreatures.sort(() => Math.random() - 0.5);
@@ -408,7 +302,6 @@ async function selectCreaturesForEncounter(guildKey, targetXP, partyLevel, diffi
     return selected.length > 0 ? selected : shuffled.slice(0, Math.min(2, shuffled.length));
 }
 
-// Gera o encontro
 async function generateEncounter() {
     const envSelect = document.getElementById("environment");
     const partySize = parseInt(document.getElementById("partySize").value) || 4;
@@ -443,67 +336,58 @@ async function generateEncounter() {
     const totalXP = encounterCreatures.reduce((sum, c) => sum + c.xp, 0);
     const adjustedXP = totalXP * (partySize / 4);
 
-    // Formata lista de criaturas
-    const creaturesHTML = encounterCreatures.map(c => `
-        <div style="background: rgba(102, 126, 234, 0.1); padding: 12px; margin: 8px 0; border-left: 3px solid #667eea; border-radius: 4px;">
-            <strong style="color: #667eea;">${c.name}</strong>
-            <div style="font-size: 0.9em; color: #aaa; margin-top: 4px;">
-                CR ${c.cr} (${c.xp} XP) • ${c.challenge}
+    const creaturesHTML = encounterCreatures.map((c, i) => {
+        const artUrl = c.data.image_uris?.art_crop || '';
+        const thumbStyle = artUrl
+            ? `background-image:url(${artUrl});background-size:cover;background-position:center;`
+            : 'background:#2d3561;';
+        return `
+        <div class="encounter-card" onclick="toggleStatBlock(this, ${i})">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:48px;height:48px;border-radius:4px;flex-shrink:0;${thumbStyle}"></div>
+                <div>
+                    <strong>${c.name}</strong>
+                    <div style="font-size:0.85em;color:#aaa;margin-top:2px;">CR ${c.cr} &bull; ${c.xp} XP &bull; ${c.data.meta || ''}</div>
+                </div>
+                <span style="margin-left:auto;color:#667eea;font-size:1.1em;">&#9660;</span>
             </div>
-        </div>
-        <div class="statblock" style="margin-bottom:20px;">
-            ${getStatBlock(c.data)}
-        </div>
-    `).join('');
+            <div class="statblock-expand" style="display:none;margin-top:10px;"></div>
+        </div>`;
+    }).join('');
 
-    // Gera HTML do resultado
     let html = `
         <div class="environment-info">
-            <strong>📍 ${environment.icon} ${environment.name}</strong>
+            <strong>${environment.icon} ${environment.name}</strong>
             <p><em>${environment.description}</em></p>
         </div>
 
-        <div style="background: rgba(102, 126, 234, 0.15); border-radius: 4px; padding: 15px; margin: 15px 0; border-left: 4px solid #667eea;">
-            <strong style="color: #667eea; font-size: 1.1em;">Encounter Creatures:</strong>
-            ${creaturesHTML}
+        <div style="background:rgba(102,126,234,0.15);border-radius:4px;padding:15px;margin:15px 0;border-left:4px solid #667eea;">
+            <strong style="color:#667eea;font-size:1.1em;">Encounter Creatures</strong>
+            <div class="encounters-grid" style="margin-top:10px;">${creaturesHTML}</div>
         </div>
 
-        <div style="background: rgba(0, 0, 0, 0.3); border-radius: 4px; padding: 15px; margin: 15px 0; border-left: 3px solid #764ba2;">
-            <strong style="color: #764ba2;">Statistics:</strong>
-            <p style="margin: 10px 0 0 0; color: #aaa;">
-                • Raw XP: ${totalXP} | Adjusted XP (${partySize} PCs): ${adjustedXP.toFixed(0)}<br>
-                • Threshold ${difficulty.toUpperCase()}: ${targetXP} XP<br>
-                • Threat: <em>${environment.threat}</em>
+        <div style="background:rgba(0,0,0,0.3);border-radius:4px;padding:15px;margin:15px 0;border-left:3px solid #764ba2;">
+            <strong style="color:#764ba2;">Statistics</strong>
+            <p style="margin:10px 0 0 0;color:#aaa;">
+                Raw XP: ${totalXP} &bull; Adjusted (${partySize} PCs): ${adjustedXP.toFixed(0)}<br>
+                Threshold ${difficulty.toUpperCase()}: ${targetXP} XP<br>
+                Threat: <em>${environment.threat}</em>
             </p>
         </div>
 
-        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px; align-items: center;">
-            <span class="difficulty-indicator difficulty-${difficulty}">
-                ${difficulty.toUpperCase()}: ${formatDifficulty(difficulty)}
-            </span>
-            <span style="color: #aaa;">
-                | ${partySize} PCs | Level ${partyLevel}
-            </span>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:15px;align-items:center;">
+            <span class="difficulty-indicator difficulty-${difficulty}">${formatDifficulty(difficulty)}</span>
+            <span style="color:#aaa;">${partySize} players &bull; Level ${partyLevel}</span>
         </div>
 
-        <div style="margin-top: 20px; padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 4px;">
-            <strong style="color: #667eea;">💡 Dica do Mestre:</strong>
-            <p style="margin: 10px 0 0 0;">
-                Use as criaturas do encontro e suas traits para criar combates dinâmicos. 
-                Acesse o navegador de criaturas para revisar as abilities completas.
-            </p>
-            <button onclick="openCreaturesTab()" style="
-                margin-top: 12px;
-                background: #667eea;
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 4px;
-                cursor: pointer;
-                font-weight: 600;
-            ">📖 Ver Criaturas Completas</button>
+        <div style="margin-top:20px;">
+            <button onclick="openCreaturesTab()" style="background:#667eea;color:white;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-weight:600;">
+                View All Creatures
+            </button>
         </div>
     `;
+
+    _encounterCreaturesData = encounterCreatures;
 
     // Atualiza UI
     document.getElementById("encounterTitle").textContent = `Encounter in ${environment.name}`;
@@ -516,30 +400,62 @@ async function generateEncounter() {
     }, 100);
 }
 
-// Opens creatures tab
 function openCreaturesTab() {
     window.location.href = "../index.html";
 }
 
-// Event listeners
-document.getElementById("environment").addEventListener("change", function() {
-    if (this.value && this.value !== "") {
-        const env = ENVIRONMENTS[this.value === "random" ? "azorius" : this.value];
+function toggleStatBlock(card, idx) {
+    const expand = card.querySelector('.statblock-expand');
+    const arrow = card.querySelector('span[style*="margin-left"]');
+    if (!expand) return;
+    if (expand.style.display === 'none') {
+        const c = _encounterCreaturesData[idx];
+        if (!c) return;
+        const d = c.data;
+        const ac = d['Armor Class'] ?? '10';
+        const hp = d['Hit Points'] ?? '10';
+        const speed = d['Speed'] || '30 ft.';
+        const str = d.STR ?? '10'; const dex = d.DEX ?? '10'; const con = d.CON ?? '10';
+        const int = d.INT ?? '10'; const wis = d.WIS ?? '10'; const cha = d.CHA ?? '10';
+        const senses = d.Senses || 'Passive Perception 10';
+        const languages = d.Languages || '—';
+        const skills = d.Skills || '—';
+        const challenge = d.Challenge || '0 (0 XP)';
+        const traits = d.Traits || '';
+        const actions = d.Actions || '<p><em>No actions listed</em></p>';
+        let imm = '';
+        if (d['Damage Immunities']) imm += `<property-line><h4>Damage Immunities</h4><p>${d['Damage Immunities']}</p></property-line>`;
+        if (d['Damage Resistances']) imm += `<property-line><h4>Damage Resistances</h4><p>${d['Damage Resistances']}</p></property-line>`;
+        if (d['Condition Immunities']) imm += `<property-line><h4>Condition Immunities</h4><p>${d['Condition Immunities']}</p></property-line>`;
+        expand.innerHTML = `<stat-block>
+          <creature-heading><h1>${d.name}</h1><h2>${d.meta || ''}</h2></creature-heading>
+          <top-stats>
+            <property-line><h4>Armor Class</h4><p>${ac}</p></property-line>
+            <property-line><h4>Hit Points</h4><p>${hp}</p></property-line>
+            <property-line><h4>Speed</h4><p>${speed}</p></property-line>
+            <abilities-block data-str="${str}" data-dex="${dex}" data-con="${con}" data-int="${int}" data-wis="${wis}" data-cha="${cha}"></abilities-block>
+            ${imm}
+            <property-line><h4>Senses</h4><p>${senses}</p></property-line>
+            <property-line><h4>Languages</h4><p>${languages}</p></property-line>
+            <property-line><h4>Skills</h4><p>${skills}</p></property-line>
+            <property-line><h4>Challenge</h4><p>${challenge}</p></property-line>
+          </top-stats>
+          ${traits}<h3>Actions</h3>${actions}
+        </stat-block>`;
+        expand.style.display = 'block';
+        if (arrow) arrow.innerHTML = '&#9650;';
+    } else {
+        expand.style.display = 'none';
+        if (arrow) arrow.innerHTML = '&#9660;';
     }
+}
+
+document.addEventListener("keypress", e => {
+    if (e.key === "Enter") generateEncounter();
 });
 
-// Enter para gerar encontro
-document.addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
-        generateEncounter();
-    }
-});
-
-// Carrega criaturas ao iniciar a página
 window.addEventListener('load', () => {
     loadCreatures().then(data => {
-        if (data) {
-            console.log(`✓ ${Object.keys(data).length} creatures loaded`);
-        }
+        if (data) console.log(`${Object.keys(data).length} creatures loaded`);
     });
 });

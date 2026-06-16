@@ -1,124 +1,123 @@
-window.onload = function () {
-  try {
-    const url_string = window.location.href;
-    const url = new URL(url_string);
-    const cardName = url.searchParams.get("card");
-    
-    fetch("data/output/final.json")
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        if (!data || Object.keys(data).length === 0) {
-          showError("No creature data available. Please run main.py first.");
-          return;
-        }
+let ALL_CREATURES = [];
+let activeColor = 'all';
+let selectedName = null;
 
-        // Setup dropdown
-        const dropdownBtn = document.getElementById('dropdownbtn');
-        const cardsDiv = document.getElementById('cards');
-        
-        if (!dropdownBtn || !cardsDiv) {
-          showError("UI elements not found.");
-          return;
-        }
+const COLOR_CLASS = { W: 'mana-w', U: 'mana-u', B: 'mana-b', R: 'mana-r', G: 'mana-g' };
+const COLOR_LABEL = { W: 'W', U: 'U', B: 'B', R: 'R', G: 'G' };
 
-        dropdownBtn.addEventListener('click', myFunction);
-
-        // Populate dropdown with creature names
-        const creatureNames = Object.keys(data).sort();
-        creatureNames.forEach(name => {
-          const link = document.createElement("a");
-          link.href = '?card=' + encodeURIComponent(name);
-          link.textContent = name;
-          cardsDiv.appendChild(link);
-        });
-
-        // Display creature if specified in URL
-        if (cardName) {
-          const creature = data[cardName];
-          if (!creature) {
-            showError(`Creature "${cardName}" not found. Select one from the dropdown.`);
-            return;
-          }
-
-          const statBlockHtml = getStatBlock(creature);
-          const fichaDiv = document.getElementById("ficha");
-          fichaDiv.innerHTML = statBlockHtml;
-
-          // Apply two-column layout if needed
-          applyLayout();
-        } else {
-          showMessage("Select a creature from the dropdown to view its stat block.");
-        }
-      })
-      .catch((error) => {
-        console.error("Error loading creature data:", error);
-        showError(`Failed to load data: ${error.message}`);
-      });
-  } catch (err) {
-    console.error("Error initializing page:", err);
-    showError(`Initialization error: ${err.message}`);
+function parseCRNum(challengeStr) {
+  if (!challengeStr) return 0;
+  const m = challengeStr.match(/^([\d/]+)/);
+  if (!m) return 0;
+  if (m[1].includes('/')) {
+    const [a, b] = m[1].split('/');
+    return parseInt(a) / parseInt(b);
   }
-};
-
-/**
- * Apply layout adjustments based on statblock height
- */
-function applyLayout() {
-  const statBlock = document.getElementById('stat-block');
-  if (!statBlock) return;
-
-  const statBlockHeight = statBlock.scrollHeight || statBlock.offsetHeight;
-  const viewportHeight = window.innerHeight;
-  const threshold = viewportHeight * 2.6;
-
-  if (statBlockHeight >= threshold) {
-    statBlock.setAttribute('data-two-column', '');
-    statBlock.style = '--data-content-height: calc(100% - 34px);';
-  } else {
-    statBlock.removeAttribute('data-two-column');
-    statBlock.style = '';
-  }
+  return parseInt(m[1]);
 }
 
-/**
- * Display error message to user
- */
-function showError(message) {
-  const fichaDiv = document.getElementById("ficha");
-  if (fichaDiv) {
-    fichaDiv.innerHTML = `<div style="padding: 20px; color: #c00; background: #fee; border: 1px solid #c00; border-radius: 4px;"><strong>Error:</strong> ${message}</div>`;
-  }
-  console.error(message);
+function manaSymbols(manaCost) {
+  if (!manaCost) return '';
+  return manaCost.replace(/\{([^}]+)\}/g, (_, s) => {
+    const key = s.toUpperCase();
+    const cls = COLOR_CLASS[key] || '';
+    return `<span class="mana-symbol ${cls}">${s}</span>`;
+  });
 }
 
-/**
- * Display informational message to user
- */
-function showMessage(message) {
-  const fichaDiv = document.getElementById("ficha");
-  if (fichaDiv) {
-    fichaDiv.innerHTML = `<div style="padding: 20px; color: #666; background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px;">${message}</div>`;
+function renderCreatureList(creatures) {
+  const list = document.getElementById('creatureList');
+  list.innerHTML = '';
+  if (!creatures.length) {
+    list.innerHTML = '<div class="no-results">No creatures found</div>';
+    return;
   }
+  const frag = document.createDocumentFragment();
+  for (const c of creatures) {
+    const div = document.createElement('div');
+    div.className = 'creature-item' + (c.name === selectedName ? ' active' : '');
+    div.dataset.name = c.name;
+
+    const dot = document.createElement('span');
+    dot.className = `rarity-dot ${c.rarity || 'common'}`;
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'creature-name';
+    nameEl.textContent = c.name;
+
+    const crTag = document.createElement('span');
+    crTag.className = 'cr-tag';
+    const crNum = parseCRNum(c.Challenge);
+    crTag.textContent = `CR ${c.Challenge ? c.Challenge.split(' ')[0] : '0'}`;
+
+    div.appendChild(dot);
+    div.appendChild(nameEl);
+    div.appendChild(crTag);
+    div.addEventListener('click', () => selectCreature(c.name));
+    frag.appendChild(div);
+  }
+  list.appendChild(frag);
 }
 
-/**
- * Generate HTML stat block from creature data
- * @param {Object} data - Creature data object
- * @returns {string} HTML string for stat block
- */
-const getStatBlock = (data) => {
-  // Validate required data
-  if (!data || typeof data !== 'object') {
-    return '<p style="color: red;">Invalid creature data</p>';
-  }
+function getFiltered() {
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const crMin = parseFloat(document.getElementById('crMin')?.value ?? 0);
+  const crMax = parseFloat(document.getElementById('crMax')?.value ?? 30);
+  const rarity = document.getElementById('rarityFilter')?.value || '';
+  const sort = document.getElementById('sortSelect')?.value || 'name';
 
-  // Extract values with fallbacks
-  const name = data.name || 'Unknown Creature';
+  let result = ALL_CREATURES.filter(c => {
+    if (search && !c.name.toLowerCase().includes(search)) return false;
+    const cr = parseCRNum(c.Challenge);
+    if (cr < crMin || cr > crMax) return false;
+    if (rarity && c.rarity !== rarity) return false;
+    if (activeColor !== 'all') {
+      const colors = c.colors || [];
+      if (!colors.includes(activeColor)) return false;
+    }
+    return true;
+  });
+
+  result.sort((a, b) => {
+    if (sort === 'cr') return parseCRNum(a.Challenge) - parseCRNum(b.Challenge);
+    if (sort === 'cr-desc') return parseCRNum(b.Challenge) - parseCRNum(a.Challenge);
+    if (sort === 'rarity') {
+      const order = { common: 0, uncommon: 1, rare: 2, mythic: 3 };
+      return (order[a.rarity] ?? 0) - (order[b.rarity] ?? 0);
+    }
+    return a.name.localeCompare(b.name);
+  });
+
+  return result;
+}
+
+function applyFilters() {
+  const filtered = getFiltered();
+  renderCreatureList(filtered);
+  const badge = document.getElementById('countBadge');
+  if (badge) badge.textContent = `${filtered.length} / ${ALL_CREATURES.length}`;
+}
+
+function selectCreature(name) {
+  selectedName = name;
+  history.pushState({ card: name }, '', `?card=${encodeURIComponent(name)}`);
+
+  // Update active state in list
+  document.querySelectorAll('.creature-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.name === name);
+  });
+
+  const creature = ALL_CREATURES.find(c => c.name === name);
+  if (!creature) return;
+
+  document.getElementById('mainContent').innerHTML = renderCreatureDisplay(creature);
+}
+
+function renderCreatureDisplay(data) {
+  const artUrl = data.image_uris?.art_crop || '';
+  const rarity = data.rarity || 'common';
+  const name = data.name || 'Unknown';
   const meta = data.meta || '';
-  const artUrl = data.image_uris?.art_crop || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23ddd%22 width=%22100%22 height=%22100%22/%3E%3C/svg%3E';
   const ac = data['Armor Class'] ?? '10';
   const hp = data['Hit Points'] ?? '10';
   const speed = data['Speed'] || '30 ft.';
@@ -134,159 +133,104 @@ const getStatBlock = (data) => {
   const challenge = data.Challenge || '0 (0 XP)';
   const traits = data.Traits || '';
   const actions = data.Actions || '<p><em>No actions listed</em></p>';
-  const damageImmunities = data['Damage Immunities'] || '';
-  const damageResistances = data['Damage Resistances'] || '';
-  const conditionImmunities = data['Condition Immunities'] || '';
+
+  const colors = data.colors || [];
+  const colorPips = colors.map(c =>
+    `<span class="mana-symbol ${COLOR_CLASS[c] || ''}">${COLOR_LABEL[c] || c}</span>`
+  ).join('');
+
+  const cmc = data.cmc != null ? data.cmc : '—';
+  const pt = (data.power && data.toughness) ? `${data.power}/${data.toughness}` : '—';
+  const manaCostHtml = manaSymbols(data.mana_cost || '');
 
   let immunityBlocks = '';
-  if (damageImmunities) {
-    immunityBlocks += `<property-line><h4>Damage Immunities</h4><p>${damageImmunities}</p></property-line>`;
-  }
-  if (damageResistances) {
-    immunityBlocks += `<property-line><h4>Damage Resistances</h4><p>${damageResistances}</p></property-line>`;
-  }
-  if (conditionImmunities) {
-    immunityBlocks += `<property-line><h4>Condition Immunities</h4><p>${conditionImmunities}</p></property-line>`;
-  }
+  if (data['Damage Immunities']) immunityBlocks += `<property-line><h4>Damage Immunities</h4><p>${data['Damage Immunities']}</p></property-line>`;
+  if (data['Damage Resistances']) immunityBlocks += `<property-line><h4>Damage Resistances</h4><p>${data['Damage Resistances']}</p></property-line>`;
+  if (data['Condition Immunities']) immunityBlocks += `<property-line><h4>Condition Immunities</h4><p>${data['Condition Immunities']}</p></property-line>`;
 
-  return `<div class="card_art" style="background-image: url(${artUrl})"><stat-block id="stat-block">
-    <creature-heading>
-      <h1>${name}</h1>
-      <h2>${meta}</h2>
-    </creature-heading>
+  const bannerStyle = artUrl ? `background-image: url(${artUrl})` : 'background: #2d3561';
 
-    <top-stats>
-      <property-line>
-        <h4>Armor Class</h4>
-        <p>${ac}</p>
-      </property-line>
-      <property-line>
-        <h4>Hit Points</h4>
-        <p>${hp}</p>
-      </property-line>
-      <property-line>
-        <h4>Speed</h4>
-        <p>${speed}</p>
-      </property-line>
+  const flavorBar = data.flavor_text
+    ? `<div class="flavor-bar">${data.flavor_text}</div>`
+    : '';
 
-      <abilities-block data-str="${str}"
-                       data-dex="${dex}"
-                       data-con="${con}"
-                       data-int="${int}"
-                       data-wis="${wis}"
-                       data-cha="${cha}"></abilities-block>
+  return `<div class="creature-display">
+    <div class="card-art-banner" style="${bannerStyle}"></div>
+    <div class="mtg-info-bar">
+      <span class="rarity-badge ${rarity}">${rarity}</span>
+      ${manaCostHtml || colorPips}
+      <span class="info-pill">CMC ${cmc}</span>
+      <span class="info-pill">P/T ${pt}</span>
+    </div>
+    <div class="type-line-bar">${data.type_line || ''}</div>
 
-      ${immunityBlocks}
-      <property-line>
-        <h4>Senses</h4>
-        <p>${senses}</p>
-      </property-line>
-      <property-line>
-        <h4>Languages</h4>
-        <p>${languages}</p>
-      </property-line>
-      <property-line>
-        <h4>Skills</h4>
-        <p>${skills}</p>
-      </property-line>
-      <property-line>
-        <h4>Challenge</h4>
-        <p>${challenge}</p>
-      </property-line>
-    </top-stats>
+    <stat-block id="stat-block">
+      <creature-heading>
+        <h1>${name}</h1>
+        <h2>${meta}</h2>
+      </creature-heading>
 
-    ${traits}
-    <h3>Actions</h3>
-    ${actions}
-  </stat-block></div>`;
+      <top-stats>
+        <property-line><h4>Armor Class</h4><p>${ac}</p></property-line>
+        <property-line><h4>Hit Points</h4><p>${hp}</p></property-line>
+        <property-line><h4>Speed</h4><p>${speed}</p></property-line>
+        <abilities-block data-str="${str}" data-dex="${dex}" data-con="${con}" data-int="${int}" data-wis="${wis}" data-cha="${cha}"></abilities-block>
+        ${immunityBlocks}
+        <property-line><h4>Senses</h4><p>${senses}</p></property-line>
+        <property-line><h4>Languages</h4><p>${languages}</p></property-line>
+        <property-line><h4>Skills</h4><p>${skills}</p></property-line>
+        <property-line><h4>Challenge</h4><p>${challenge}</p></property-line>
+      </top-stats>
+
+      ${traits}
+      <h3>Actions</h3>
+      ${actions}
+    </stat-block>
+    ${flavorBar}
+  </div>`;
+}
+
+function wireFilters() {
+  document.getElementById('searchInput')?.addEventListener('input', applyFilters);
+  document.getElementById('crMin')?.addEventListener('input', applyFilters);
+  document.getElementById('crMax')?.addEventListener('input', applyFilters);
+  document.getElementById('rarityFilter')?.addEventListener('change', applyFilters);
+  document.getElementById('sortSelect')?.addEventListener('change', applyFilters);
+
+  document.querySelectorAll('.color-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeColor = btn.dataset.color;
+      document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilters();
+    });
+  });
+}
+
+window.addEventListener('popstate', e => {
+  const name = e.state?.card || new URLSearchParams(location.search).get('card');
+  if (name) selectCreature(name);
+});
+
+window.onload = () => {
+  fetch('data/output/final.json')
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    })
+    .then(data => {
+      ALL_CREATURES = Object.values(data);
+      wireFilters();
+      applyFilters();
+
+      const cardName = new URLSearchParams(location.search).get('card');
+      if (cardName && data[cardName]) {
+        selectCreature(cardName);
+      }
+    })
+    .catch(err => {
+      document.getElementById('mainContent').innerHTML =
+        `<div class="welcome-msg"><h2 style="color:#c00">Error</h2><p>${err.message}</p></div>`;
+      document.getElementById('countBadge').textContent = 'Error';
+    });
 };
-
-/**
- * Generate immunity/resistance property blocks
- * @param {Object} data - Creature data with immunity properties
- * @returns {string} HTML property-line elements
- */
-const immunities = (data) => {
-  let propertyBlocks = '';
-
-  if (data['Damage Immunities']) {
-    propertyBlocks += `<property-line><h4>Damage Immunities</h4><p>${data['Damage Immunities']}</p></property-line>`;
-  }
-
-  if (data['Damage Resistances']) {
-    propertyBlocks += `<property-line><h4>Damage Resistances</h4><p>${data['Damage Resistances']}</p></property-line>`;
-  }
-
-  if (data['Condition Immunities']) {
-    propertyBlocks += `<property-line><h4>Condition Immunities</h4><p>${data['Condition Immunities']}</p></property-line>`;
-  }
-
-  return propertyBlocks;
-};
-
-/**
- * Toggle dropdown menu visibility
- */
-function myFunction() {
-  const cardsDiv = document.getElementById("cards");
-  if (cardsDiv) {
-    cardsDiv.classList.toggle("show");
-  }
-}
-
-/**
- * Filter dropdown items based on search input
- */
-function filterFunction() {
-  const input = document.getElementById("myInput");
-  if (!input) return;
-
-  const filter = input.value.toUpperCase();
-  const cardsDiv = document.getElementById("cards");
-  if (!cardsDiv) return;
-
-  const links = cardsDiv.getElementsByTagName("a");
-  for (let i = 0; i < links.length; i++) {
-    const textValue = links[i].textContent || links[i].innerText;
-    if (textValue.toUpperCase().indexOf(filter) > -1) {
-      links[i].style.display = "";
-    } else {
-      links[i].style.display = "none";
-    }
-  }
-}
-
-/**
- * Close dropdown when clicking outside
- */
-document.addEventListener('click', function(event) {
-  const cardsDiv = document.getElementById('cards');
-  const dropdownBtn = document.getElementById('dropdownbtn');
-  
-  if (cardsDiv && dropdownBtn && !cardsDiv.contains(event.target) && !dropdownBtn.contains(event.target)) {
-    cardsDiv.classList.remove('show');
-  }
-});function isMobileDevice() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-         window.innerWidth <= 768;
-}
-
-window.addEventListener("orientationchange", () => {
-  setTimeout(applyLayout, 100);
-});
-
-let resizeTimeout;
-window.addEventListener("resize", () => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(applyLayout, 250);
-});
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    const cards = document.getElementById("cards");
-    if (cards?.classList.contains("show")) {
-      cards.classList.remove("show");
-      document.getElementById("dropdownbtn")?.focus();
-    }
-  }
-});
