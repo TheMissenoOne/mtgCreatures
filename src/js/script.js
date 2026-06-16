@@ -1,6 +1,11 @@
 let ALL_CREATURES = [];
 let activeColor = 'all';
 let selectedName = null;
+let _searchDebounce;
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 
 const COLOR_CLASS = { W: 'mana-w', U: 'mana-u', B: 'mana-b', R: 'mana-r', G: 'mana-g' };
 const COLOR_LABEL = { W: 'W', U: 'U', B: 'B', R: 'R', G: 'G' };
@@ -47,7 +52,6 @@ function renderCreatureList(creatures) {
 
     const crTag = document.createElement('span');
     crTag.className = 'cr-tag';
-    const crNum = parseCRNum(c.Challenge);
     crTag.textContent = `CR ${c.Challenge ? c.Challenge.split(' ')[0] : '0'}`;
 
     div.appendChild(dot);
@@ -151,23 +155,23 @@ function renderCreatureDisplay(data) {
   const bannerStyle = artUrl ? `background-image: url(${artUrl})` : 'background: #2d3561';
 
   const flavorBar = data.flavor_text
-    ? `<div class="flavor-bar">${data.flavor_text}</div>`
+    ? `<div class="flavor-bar">${escapeHtml(data.flavor_text)}</div>`
     : '';
 
   return `<div class="creature-display">
     <div class="card-art-banner" style="${bannerStyle}"></div>
     <div class="mtg-info-bar">
-      <span class="rarity-badge ${rarity}">${rarity}</span>
+      <span class="rarity-badge ${rarity}">${escapeHtml(rarity)}</span>
       ${manaCostHtml || colorPips}
-      <span class="info-pill">CMC ${cmc}</span>
-      <span class="info-pill">P/T ${pt}</span>
+      <span class="info-pill">CMC ${escapeHtml(String(cmc))}</span>
+      <span class="info-pill">P/T ${escapeHtml(pt)}</span>
     </div>
-    <div class="type-line-bar">${data.type_line || ''}</div>
+    <div class="type-line-bar">${escapeHtml(data.type_line || '')}</div>
 
     <stat-block id="stat-block">
       <creature-heading>
-        <h1>${name}</h1>
-        <h2>${meta}</h2>
+        <h1>${escapeHtml(name)}</h1>
+        <h2>${escapeHtml(meta)}</h2>
       </creature-heading>
 
       <top-stats>
@@ -191,7 +195,10 @@ function renderCreatureDisplay(data) {
 }
 
 function wireFilters() {
-  document.getElementById('searchInput')?.addEventListener('input', applyFilters);
+  document.getElementById('searchInput')?.addEventListener('input', () => {
+    clearTimeout(_searchDebounce);
+    _searchDebounce = setTimeout(applyFilters, 150);
+  });
   document.getElementById('crMin')?.addEventListener('input', applyFilters);
   document.getElementById('crMax')?.addEventListener('input', applyFilters);
   document.getElementById('rarityFilter')?.addEventListener('change', applyFilters);
