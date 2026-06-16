@@ -97,6 +97,17 @@ COLOR_TRAITS = {
     "boros": "<property-block><h4>Legion Tactics.</h4><p>The creature adds its proficiency bonus to initiative. If an ally is within 5 feet of the target, it deals an extra 1d6 damage.</p></property-block>",
 
     "simic": "<property-block><h4>Adaptive Evolution.</h4><p>At the start of each of its turns, the creature may choose to gain resistance to one damage type until the start of its next turn.</p></property-block>",
+
+    # Mono-color traits (single-color cards)
+    "white": "<property-block><h4>Restorative Aura.</h4><p>At the start of each of its turns, this creature grants one creature of its choice within 30 feet temporary hit points equal to its proficiency bonus. This creature also has advantage on saving throws against being frightened.</p></property-block>",
+
+    "blue": "<property-block><h4>Arcane Insight.</h4><p>This creature can cast one cantrip of its choice from the wizard spell list, using Intelligence as its spellcasting ability. It has advantage on Intelligence (Arcana) checks and can read all writing regardless of language.</p></property-block>",
+
+    "black": "<property-block><h4>Death Hunger.</h4><p>When this creature reduces an enemy to 0 hit points, it regains hit points equal to its proficiency bonus. It has advantage on saving throws against being charmed and on death saving throws.</p></property-block>",
+
+    "red": "<property-block><h4>Savage Fury.</h4><p>When this creature hits with a melee attack, it can make one additional attack with disadvantage against the same target as a bonus action. This creature also has advantage on initiative rolls.</p></property-block>",
+
+    "green": "<property-block><h4>Natural Resilience.</h4><p>This creature has advantage on Constitution saving throws. When reduced below half its hit points, it regains 1d6 hit points at the start of each of its turns until it reaches 0 HP or is healed above half.</p></property-block>",
 }
 
 # ==========================================================
@@ -152,6 +163,27 @@ COLOR_TRAIT_BALANCE = {
     "simic": {"cost": 2, "cr_offense": 0.4, "cr_defense": 0.6, "dpr_bonus": 0.5, "hp_multiplier": 1.10,
               "mechanism": "Adaptive + Resistances",
               "notes": "Adaptabilidade -> aumenta defesa e utilidade. At start of turn, choose 1 damage resistance (resets each turn). HP multiplier reflects hardiness."},
+
+    # Mono-color traits
+    "white": {"cost": 1, "cr_offense": 0.1, "cr_defense": 0.4, "dpr_bonus": 0.0, "hp_multiplier": 1.00,
+              "mechanism": "Aura/Heal",
+              "notes": "Suporte/cura passiva; leve aumento defensivo via temp HP allies. Advantage vs frightened."},
+
+    "blue":  {"cost": 1, "cr_offense": 0.2, "cr_defense": 0.2, "dpr_bonus": 0.5, "hp_multiplier": 1.00,
+              "mechanism": "Spell-like",
+              "notes": "Cantrip ofensivo/utilitário; pequena pressão mágica. Arcana proficiency advantage."},
+
+    "black": {"cost": 1, "cr_offense": 0.3, "cr_defense": 0.3, "dpr_bonus": 0.0, "hp_multiplier": 1.00,
+              "mechanism": "Drain/Heal",
+              "notes": "Dreno leve via kills; resilência contra charme e morte."},
+
+    "red":   {"cost": 1, "cr_offense": 0.5, "cr_defense": 0.0, "dpr_bonus": 2.0, "hp_multiplier": 1.00,
+              "mechanism": "Bonus Attack",
+              "notes": "Ataque bônus com desvantagem aumenta DPR; vantagem em iniciativa para burst."},
+
+    "green": {"cost": 1, "cr_offense": 0.0, "cr_defense": 0.5, "dpr_bonus": 0.0, "hp_multiplier": 1.05,
+              "mechanism": "Regeneration",
+              "notes": "Regeneração passiva abaixo de half HP; durabilidade extra em fights longas."},
 }
 
 

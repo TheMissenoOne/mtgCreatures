@@ -1,4 +1,58 @@
-# Refactoring Changelog
+# Changelog
+
+## v2.0 — Improved Heuristics, Semantic Matching, Mono-Color Traits, CI/CD
+
+### New: GitHub Actions Deploy Pipeline (`.github/workflows/deploy.yml`)
+- Triggers on push to `main` and manual dispatch
+- Installs Python deps (`scikit-learn`, `numpy`) with pip caching
+- Runs `backend/main.py` to regenerate `data/output/final.json`
+- Commits updated output back to `main` (with `[skip ci]` to prevent loops)
+- Deploys the static frontend to GitHub Pages automatically
+
+### New: Semantic Base-Creature Matcher (`backend/creature_matcher.py`)
+- `CreatureMatcher` class uses TF-IDF cosine similarity to find the best-matching D&D 5e monster for any MTG creature type string
+- Fallback hierarchy: exact name → category map → word overlap → difflib fuzzy → TF-IDF cosine
+- Category map covers 60+ Ravnica-specific types (Viashino→Lizardfolk, Drake→Wyvern, etc.)
+- Gracefully degrades if `scikit-learn` is unavailable (falls back to exact matching)
+- Integrated into `RavnicaCardConverter` — unknown MTG types now resolve to semantically similar D&D creatures
+
+### New: Mono-Color Traits (5 new entries in `config.py`)
+- `white` → *Restorative Aura* (temp HP aura, fear advantage)
+- `blue` → *Arcane Insight* (cantrip, Arcana advantage)
+- `black` → *Death Hunger* (HP from kills, charm resistance)
+- `red` → *Savage Fury* (bonus attack, initiative advantage)
+- `green` → *Natural Resilience* (CON saves, low-HP regen)
+- Cost 1 each (fits even low-CR creatures); 609 of 920 creatures now receive a color trait (was 75)
+
+### Improved: Keyword Extraction (`creature_converter.py`)
+- **Before**: `if keyword.lower() in oracle_text` — substring match causing false positives ("Scavenge" on "Scavenger", "Adapt" on "adapts")
+- **After**: 
+  1. Check Scryfall's authoritative `keywords` field first (no false positives)
+  2. Word-boundary regex (`\bKeyword\b`) on oracle text as fallback
+  3. Semantic inference patterns (`"can't be destroyed"` → Indestructible, `"can't be the target of spells"` → Hexproof)
+- Pre-compiled regex patterns cached at module level for performance
+
+### Improved: Ability Score Differentiation (`creature_converter.py`)
+- **Before**: All 6 scores identical (`10 + CR × 0.75`) before type merging
+- **After**: Scores differentiated using card characteristics:
+  - **P/T ratio**: high power → STR+3/CON-1/DEX+2; high toughness → CON+3/STR-1
+  - **Colors**: W→WIS+2, U→INT+3, B→CHA+2, G→CON+1+WIS+1, R→STR+1
+  - **CMC**: ≥4 CMC → INT boost (complex cards need more intelligence)
+  - **Oracle keywords**: Flying→DEX+2, Trample→STR+2, Hexproof/Indestructible→CON+2
+  - Adjustment applied **after** type merging so it's not diluted away
+  - Result: 74% of defense-heavy (T≥2×P) cards now show CON>STR; 57% of offense-heavy (P≥2×T) show STR>CON
+
+### Improved: CR Formula (`stats_calculator.py`)
+- Added `keyword_count` parameter to `calculate_ravnica_card_cr`
+- Each recognized keyword adds +0.3 CR (max +2) — cards with many abilities are appropriately higher CR
+- Guard `effective_cmc = max(1.0, cmc)` prevents CMC=0 issues
+- Fixed pre-existing `List` import bug in `apply_trait_adjustments` signature
+
+### New: `requirements.txt`
+- `scikit-learn>=1.3.0`, `numpy>=1.24.0`
+- Previously the pipeline had zero external dependencies; scikit-learn enables the TF-IDF matcher
+
+---
 
 ## Summary of Changes
 
