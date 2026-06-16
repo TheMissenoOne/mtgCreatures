@@ -112,6 +112,7 @@ async function loadCreatures() {
     
     try {
         const response = await fetch('../data/output/final.json');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         CREATURES_DATABASE = await response.json();
         return CREATURES_DATABASE;
     } catch (error) {
@@ -124,7 +125,7 @@ async function loadCreatures() {
 function colorsToGuild(colors) {
     if (!colors || colors.length !== 2) return null;
     
-    const sorted = colors.sort().join('');
+    const sorted = [...colors].sort().join('');
     const colorCombos = {
         'UW': 'azorius', // sorted U,W
         'BU': 'dimir',  // B,U
@@ -140,11 +141,17 @@ function colorsToGuild(colors) {
     return colorCombos[sorted];
 }
 
-// Extract numeric CR from string like "8 (3900 XP)"
+// Extract numeric CR from string like "8 (3900 XP)" or "1/4 (50 XP)"
 function parseCR(challengeStr) {
     if (!challengeStr) return 0;
     const match = challengeStr.match(/^([\d/\.]+)/);
-    return match ? match[1] : '0';
+    if (!match) return 0;
+    const raw = match[1];
+    if (raw.includes('/')) {
+        const [a, b] = raw.split('/');
+        return parseInt(a) / parseInt(b);
+    }
+    return parseFloat(raw);
 }
 
 // Filter creatures by guild and CR range
@@ -193,21 +200,29 @@ function filterCreaturesByGuildAndCR(creatures, guildKey, minCR, maxCR) {
 // Calculate XP thresholds by level and party size
 function calculateThresholds(partyLevel, partySize) {
     const xpByLevel = {
-        1: { easy: 25, medium: 50, hard: 75, deadly: 100 },
-        2: { easy: 50, medium: 100, hard: 150, deadly: 200 },
-        3: { easy: 75, medium: 150, hard: 225, deadly: 400 },
-        4: { easy: 125, medium: 250, hard: 375, deadly: 500 },
-        5: { easy: 250, medium: 500, hard: 750, deadly: 1100 },
-        6: { easy: 300, medium: 600, hard: 900, deadly: 1400 },
-        7: { easy: 350, medium: 750, hard: 1100, deadly: 1700 },
-        8: { easy: 450, medium: 900, hard: 1400, deadly: 2100 },
-        9: { easy: 550, medium: 1100, hard: 1600, deadly: 2400 },
-        10: { easy: 600, medium: 1200, hard: 1900, deadly: 2800 },
-        15: { easy: 1100, medium: 2200, hard: 3300, deadly: 5500 },
-        20: { easy: 2000, medium: 3900, hard: 5900, deadly: 9500 }
+        1:  { easy: 25,   medium: 50,   hard: 75,   deadly: 100  },
+        2:  { easy: 50,   medium: 100,  hard: 150,  deadly: 200  },
+        3:  { easy: 75,   medium: 150,  hard: 225,  deadly: 400  },
+        4:  { easy: 125,  medium: 250,  hard: 375,  deadly: 500  },
+        5:  { easy: 250,  medium: 500,  hard: 750,  deadly: 1100 },
+        6:  { easy: 300,  medium: 600,  hard: 900,  deadly: 1400 },
+        7:  { easy: 350,  medium: 750,  hard: 1100, deadly: 1700 },
+        8:  { easy: 450,  medium: 900,  hard: 1400, deadly: 2100 },
+        9:  { easy: 550,  medium: 1100, hard: 1600, deadly: 2400 },
+        10: { easy: 600,  medium: 1200, hard: 1900, deadly: 2800 },
+        11: { easy: 800,  medium: 1600, hard: 2400, deadly: 3600 },
+        12: { easy: 1000, medium: 2000, hard: 3000, deadly: 4500 },
+        13: { easy: 1100, medium: 2200, hard: 3300, deadly: 5100 },
+        14: { easy: 1250, medium: 2500, hard: 3800, deadly: 5700 },
+        15: { easy: 1400, medium: 2800, hard: 4200, deadly: 6300 },
+        16: { easy: 1600, medium: 3200, hard: 4800, deadly: 7200 },
+        17: { easy: 2000, medium: 3900, hard: 5900, deadly: 9500 },
+        18: { easy: 2100, medium: 4200, hard: 6300, deadly: 9500 },
+        19: { easy: 2400, medium: 4900, hard: 7300, deadly: 9500 },
+        20: { easy: 2800, medium: 5700, hard: 8500, deadly: 10900 },
     };
 
-    const baseXp = xpByLevel[Math.min(partyLevel, 20)] || xpByLevel[20];
+    const baseXp = xpByLevel[Math.min(Math.max(partyLevel, 1), 20)];
     const multiplier = partySize / 4;
 
     return {
@@ -216,22 +231,6 @@ function calculateThresholds(partyLevel, partySize) {
         hard: Math.floor(baseXp.hard * multiplier),
         deadly: Math.floor(baseXp.deadly * multiplier)
     };
-}
-
-// Get best CR match for XP budget
-function getCRForBudget(xpBudget) {
-    let bestCR = 0;
-    let bestDiff = xpBudget;
-    
-    for (const [cr, xp] of Object.entries(CR_XP_VALUES)) {
-        const diff = Math.abs(xp - xpBudget);
-        if (diff < bestDiff) {
-            bestDiff = diff;
-            bestCR = cr;
-        }
-    }
-    
-    return parseFloat(bestCR);
 }
 
 // Select random difficulty with weights
@@ -328,7 +327,6 @@ async function generateEncounter() {
     const thresholds = calculateThresholds(partyLevel, partySize);
     const targetXP = thresholds[difficulty];
     
-    // Seleciona criaturas para o encontro
     const encounterCreatures = await selectCreaturesForEncounter(
         environmentKey, targetXP, partyLevel, difficulty
     );
@@ -349,7 +347,7 @@ async function generateEncounter() {
                     <strong>${c.name}</strong>
                     <div style="font-size:0.85em;color:#aaa;margin-top:2px;">CR ${c.cr} &bull; ${c.xp} XP &bull; ${c.data.meta || ''}</div>
                 </div>
-                <span style="margin-left:auto;color:#667eea;font-size:1.1em;">&#9660;</span>
+                <span class="expand-arrow" style="margin-left:auto;color:#667eea;font-size:1.1em;">&#9660;</span>
             </div>
             <div class="statblock-expand" style="display:none;margin-top:10px;"></div>
         </div>`;
@@ -389,12 +387,10 @@ async function generateEncounter() {
 
     _encounterCreaturesData = encounterCreatures;
 
-    // Atualiza UI
     document.getElementById("encounterTitle").textContent = `Encounter in ${environment.name}`;
     document.getElementById("encounterContent").innerHTML = html;
     document.getElementById("encounterResult").classList.add("visible");
 
-    // Scroll para resultado
     setTimeout(() => {
         document.getElementById("encounterResult").scrollIntoView({ behavior: "smooth" });
     }, 100);
@@ -406,7 +402,7 @@ function openCreaturesTab() {
 
 function toggleStatBlock(card, idx) {
     const expand = card.querySelector('.statblock-expand');
-    const arrow = card.querySelector('span[style*="margin-left"]');
+    const arrow = card.querySelector('.expand-arrow');
     if (!expand) return;
     if (expand.style.display === 'none') {
         const c = _encounterCreaturesData[idx];
