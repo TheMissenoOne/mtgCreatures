@@ -9,12 +9,11 @@ const HTML = `<style>
     z-index: 1;
     max-width: 100%;
   }
-  :host { display: inline-block; max-width: 100%; }
+  :host { display: inline-block; max-width: 100%; color: #1a1a1a; }
   #content-wrap {
     font-family: 'Noto Sans', Calibri, Helvetica, Arial, sans-serif;
     font-size: 13.5px;
     background: #FDF1DC;
-    color: #1a1a1a;
     padding: 0.6em;
     padding-bottom: 0.5em;
     border: 1px #DDD solid;

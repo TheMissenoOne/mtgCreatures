@@ -16,54 +16,53 @@
     <script type="module" src="js/tapered-rule.js"></script>
     <style>
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #eee;
+            background: #090d16;
+            color: #bcc8e0;
             overflow: visible;
+            font-family: 'Noto Sans', sans-serif;
         }
 
         body { font-family: 'Noto Sans', sans-serif; }
         .statblock-expand stat-block { color: black; }
 
         .encounters-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #140826 0%, #0f1e3d 100%);
+            border-bottom: 1px solid rgba(139,92,246,0.35);
             color: white;
-            padding: 20px;
+            padding: 16px 20px;
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .encounters-header h1 {
             margin: 0;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 1.8em;
+            background: linear-gradient(90deg, #e0d0ff, #a78bfa);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
         .encounters-header p {
-            margin: 10px 0 0 0;
-            font-size: 1.1em;
-            opacity: 0.95;
+            margin: 4px 0 0 0;
+            font-size: 0.95em;
+            color: #9a8acc;
         }
         
         .back-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            padding: 8px 16px;
-            border-radius: 4px;
+            background: rgba(139,92,246,0.18);
+            color: #d4b8ff;
+            border: 1px solid rgba(139,92,246,0.35);
+            padding: 7px 16px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 0.85em;
+            font-size: 0.82em;
             font-weight: 600;
-            transition: all 0.2s ease;
+            transition: background 0.2s;
             white-space: nowrap;
         }
-        
-        .back-btn:active {
-            background: rgba(255, 255, 255, 0.35);
-            transform: scale(0.95);
-        }
+        .back-btn:hover { background: rgba(139,92,246,0.32); }
 
         .encounters-container {
             display: flex;
@@ -74,18 +73,17 @@
         }
 
         .encounter-panel {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: rgba(139,92,246,0.06);
+            border: 1px solid rgba(139,92,246,0.22);
             border-radius: 8px;
-            padding: 25px;
-            backdrop-filter: blur(10px);
+            padding: 22px;
         }
 
         .encounter-panel h2 {
             margin-top: 0;
-            color: #667eea;
-            font-size: 1.5em;
-            border-bottom: 2px solid #764ba2;
+            color: #a78bfa;
+            font-size: 1.3em;
+            border-bottom: 1px solid rgba(139,92,246,0.3);
             padding-bottom: 10px;
         }
 
@@ -104,29 +102,29 @@
 
         .form-group select,
         .form-group input {
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.5);
-            border-radius: 4px;
-            color: white;
-            font-size: 1em;
+            padding: 10px 12px;
+            background: #070a12;
+            border: 1px solid #232b3e;
+            border-radius: 6px;
+            color: #bcc8e0;
+            font-size: 0.95em;
             -webkit-appearance: none;
             appearance: none;
+            outline: none;
         }
 
         .form-group select {
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 10px center;
-            background-size: 20px;
-            padding-right: 40px;
+            background-size: 18px;
+            padding-right: 36px;
         }
 
         .form-group select:focus,
         .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 2px rgba(139,92,246,0.18);
         }
 
         .button-group {
@@ -141,32 +139,29 @@
 
         button {
             flex: 1;
-            min-width: 160px;
-            padding: 14px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-width: 150px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #5b21b6 0%, #4338ca 100%);
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 1.05em;
-            font-weight: bold;
+            font-size: 0.95em;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            min-height: 48px;
+            transition: opacity 0.2s;
+            min-height: 44px;
         }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
+        button:hover { opacity: 0.88; }
+        button:active { transform: scale(0.98); }
         button.secondary {
-            background: rgba(102, 126, 234, 0.3);
-            border: 2px solid #667eea;
+            background: rgba(139,92,246,0.2);
+            border: 1px solid rgba(139,92,246,0.45);
         }
 
         .encounter-result {
-            background: rgba(102, 126, 234, 0.1);
-            border-left: 4px solid #667eea;
-            border-radius: 4px;
+            background: rgba(139,92,246,0.07);
+            border-left: 4px solid #8b5cf6;
+            border-radius: 6px;
             padding: 20px;
             margin-top: 20px;
             display: none;
@@ -190,8 +185,8 @@
 
         .encounter-result h3 {
             margin-top: 0;
-            color: #667eea;
-            font-size: 1.3em;
+            color: #a78bfa;
+            font-size: 1.2em;
         }
 
         .environment-info {
