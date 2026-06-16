@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Ravnica Encounter Generator - D&D 5e</title>
     <meta name="description" content="Generate random encounters themed for D&D 5e in Ravnica" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet" />
-    <!-- Custom elements for stat blocks -->
     <script type="module" src="js/stat-block.js"></script>
     <script type="module" src="js/creature-heading.js"></script>
     <script type="module" src="js/top-stats.js"></script>
@@ -15,46 +14,62 @@
     <script type="module" src="js/property-block.js"></script>
     <script type="module" src="js/tapered-rule.js"></script>
     <style>
-        body {
-            background: #090d16;
-            color: #bcc8e0;
-            overflow: visible;
-            font-family: 'Noto Sans', sans-serif;
+        *, *::before, *::after { box-sizing: border-box; }
+
+        :root {
+            --bg:            #090d16;
+            --panel-bg:      rgba(139,92,246,0.06);
+            --panel-border:  rgba(139,92,246,0.22);
+            --accent:        #8b5cf6;
+            --accent-soft:   rgba(139,92,246,0.18);
+            --accent-border: rgba(139,92,246,0.35);
+            --input-bg:      #070a12;
+            --input-border:  #232b3e;
+            --text:          #bcc8e0;
+            --text-dim:      #6b7a99;
         }
 
-        body { font-family: 'Noto Sans', sans-serif; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Noto Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
         .statblock-expand stat-block { color: black; }
 
+        /* ── Header ── */
         .encounters-header {
             background: linear-gradient(135deg, #140826 0%, #0f1e3d 100%);
-            border-bottom: 1px solid rgba(139,92,246,0.35);
+            border-bottom: 1px solid var(--accent-border);
             color: white;
-            padding: 16px 20px;
-            text-align: center;
+            padding: 14px 20px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .encounters-header h1 {
             margin: 0;
-            font-size: 1.8em;
+            font-size: 1.25em;
+            flex: 1;
             background: linear-gradient(90deg, #e0d0ff, #a78bfa);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .encounters-header p {
-            margin: 4px 0 0 0;
-            font-size: 0.95em;
+            margin: 0;
+            font-size: 0.88em;
             color: #9a8acc;
         }
-        
+
         .back-btn {
-            background: rgba(139,92,246,0.18);
+            background: var(--accent-soft);
             color: #d4b8ff;
-            border: 1px solid rgba(139,92,246,0.35);
-            padding: 7px 16px;
+            border: 1px solid var(--accent-border);
+            padding: 6px 14px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.82em;
@@ -64,56 +79,62 @@
         }
         .back-btn:hover { background: rgba(139,92,246,0.32); }
 
+        /* ── Layout ── */
         .encounters-container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            min-height: calc(100vh - 150px);
-            padding: 20px;
             gap: 20px;
         }
 
+        /* ── Config Panel ── */
         .encounter-panel {
-            background: rgba(139,92,246,0.06);
-            border: 1px solid rgba(139,92,246,0.22);
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
             border-radius: 8px;
             padding: 22px;
         }
 
         .encounter-panel h2 {
-            margin-top: 0;
+            margin: 0 0 18px 0;
             color: #a78bfa;
-            font-size: 1.3em;
-            border-bottom: 1px solid rgba(139,92,246,0.3);
+            font-size: 1.1em;
+            border-bottom: 1px solid var(--panel-border);
             padding-bottom: 10px;
         }
 
         .form-group {
-            margin: 15px 0;
+            margin: 14px 0;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .form-group label {
-            font-weight: bold;
-            color: #aaa;
-            font-size: 0.95em;
+            font-weight: 600;
+            color: #8899bb;
+            font-size: 0.82em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .form-group select,
-        .form-group input {
+        .form-group input[type="number"] {
             padding: 10px 12px;
-            background: #070a12;
-            border: 1px solid #232b3e;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
             border-radius: 6px;
-            color: #bcc8e0;
+            color: var(--text);
             font-size: 0.95em;
-            -webkit-appearance: none;
-            appearance: none;
             outline: none;
+            transition: border-color 0.15s;
         }
 
         .form-group select {
+            -webkit-appearance: none;
+            appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 10px center;
@@ -122,24 +143,38 @@
         }
 
         .form-group select:focus,
-        .form-group input:focus {
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 2px rgba(139,92,246,0.18);
+        .form-group input[type="number"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-soft);
         }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Environment description preview */
+        #envDescription {
+            background: rgba(0,0,0,0.25);
+            border-left: 3px solid var(--accent);
+            border-radius: 4px;
+            padding: 10px 14px;
+            margin-top: 6px;
+            display: none;
+        }
+        .env-desc-name { font-weight: 700; color: #c4b0ff; font-size: 0.92em; margin-bottom: 3px; }
+        .env-desc-sub  { font-size: 0.82em; color: var(--text-dim); margin-bottom: 4px; }
+        .env-desc-guilds { font-size: 0.78em; color: #7a6aaa; }
 
         .button-group {
             display: flex;
-        }
-        .statblock {
-            margin-top: 10px;
-            background: rgba(0,0,0,0.2);
-            padding: 10px;
-            border-radius: 6px;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         button {
             flex: 1;
-            min-width: 150px;
             padding: 12px 20px;
             background: linear-gradient(135deg, #5b21b6 0%, #4338ca 100%);
             color: white;
@@ -154,16 +189,16 @@
         button:hover { opacity: 0.88; }
         button:active { transform: scale(0.98); }
         button.secondary {
-            background: rgba(139,92,246,0.2);
-            border: 1px solid rgba(139,92,246,0.45);
+            background: var(--accent-soft);
+            border: 1px solid var(--accent-border);
         }
 
+        /* ── Result Panel ── */
         .encounter-result {
-            background: rgba(139,92,246,0.07);
-            border-left: 4px solid #8b5cf6;
-            border-radius: 6px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
             padding: 20px;
-            margin-top: 20px;
             display: none;
         }
 
@@ -173,158 +208,292 @@
         }
 
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        .encounter-result h3 {
-            margin-top: 0;
+        .encounter-result > h3 {
+            margin: 0 0 16px 0;
             color: #a78bfa;
-            font-size: 1.2em;
+            font-size: 1.1em;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 10px;
         }
 
-        .environment-info {
-            background: rgba(0, 0, 0, 0.3);
+        /* Environment block */
+        .result-env {
+            margin-bottom: 14px;
+        }
+        .result-env-name {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #d4c4ff;
+            margin-bottom: 3px;
+        }
+        .result-env-sub {
+            font-size: 0.85em;
+            color: var(--text-dim);
+            font-style: italic;
+        }
+
+        /* Hook */
+        .result-hook {
+            background: rgba(0,0,0,0.22);
+            border-left: 3px solid #7c3aed;
             border-radius: 4px;
-            padding: 15px;
-            margin: 15px 0;
-            border-left: 3px solid #764ba2;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            font-size: 0.9em;
+            line-height: 1.55;
         }
-
-        .environment-info strong {
-            color: #aaa;
+        .result-hook-label {
             display: block;
-            margin-bottom: 8px;
-        }
-
-        .encounters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .encounter-card {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            border-radius: 4px;
-            padding: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .encounter-card:hover {
-            background: rgba(102, 126, 234, 0.2);
-            border-color: #667eea;
-            transform: translateY(-2px);
-        }
-
-        .encounter-card strong {
-            color: #667eea;
-            display: block;
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #9a7adc;
             margin-bottom: 5px;
         }
 
-        .encounter-card em {
-            font-style: italic;
-            color: #bbb;
-            font-size: 0.95em;
+        /* Section label */
+        .result-section { margin-bottom: 16px; }
+        .result-section-label {
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #7a6aaa;
+            margin-bottom: 10px;
         }
 
-        .guild-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
+        /* Creature cards */
+        .encounters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+        }
+
+        .encounter-card {
+            background: rgba(0,0,0,0.22);
+            border: 1px solid rgba(139,92,246,0.2);
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .encounter-card:hover {
+            background: rgba(139,92,246,0.1);
+            border-color: var(--accent);
+        }
+
+        .encounter-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .encounter-card-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            background: #1c2230;
+        }
+
+        .encounter-card-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .encounter-card-info strong {
+            display: block;
+            color: #c4b0ff;
+            font-size: 0.9em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .encounter-card-meta {
+            font-size: 0.78em;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
+
+        .expand-arrow {
+            color: var(--text-dim);
+            font-size: 0.8em;
+            flex-shrink: 0;
+            user-select: none;
+        }
+
+        .statblock-expand {
+            margin-top: 12px;
+        }
+
+        /* Stats row */
+        .result-stats {
+            background: rgba(0,0,0,0.18);
+            border-radius: 6px;
+            padding: 12px 14px;
+        }
+        .stat-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .stat-key {
+            font-size: 0.72em;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #7a6aaa;
+            display: block;
+        }
+        .stat-threat {
+            font-size: 0.84em;
+            color: var(--text-dim);
+            border-top: 1px solid rgba(139,92,246,0.15);
+            padding-top: 8px;
+            margin-top: 4px;
+        }
+        .stat-threat .stat-key { display: inline; margin-right: 6px; }
+
+        /* Footer */
+        .result-footer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+        .footer-party {
+            font-size: 0.82em;
+            color: var(--text-dim);
+        }
+        .reroll-btn {
+            margin-left: auto;
+            flex: 0 0 auto;
+            padding: 8px 18px;
             font-size: 0.85em;
-            font-weight: bold;
-            margin: 4px 4px 4px 0;
+            background: var(--accent-soft);
+            border: 1px solid var(--accent-border);
+            min-height: auto;
         }
 
-        .azorius { background: #cfe2ff; color: #003d82; }
-        .dimir { background: #b5cce8; color: #002147; }
-        .rakdos { background: #ffc1c1; color: #5a0000; }
-        .golgari { background: #d4d4a8; color: #2a2a00; }
-        .selesnya { background: #c8e6c9; color: #1b5e20; }
-        .orzhov { background: #e8e8e8; color: #212121; }
-        .izzet { background: #ffe0b2; color: #e65100; }
-        .gruul { background: #c8e6c9; color: #1b5e20; }
-        .boros { background: #ffccbc; color: #bf360c; }
-        .simic { background: #b2dfdb; color: #00695c; }
-
+        /* Difficulty badges */
         .difficulty-indicator {
             display: inline-block;
             padding: 4px 12px;
             border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: bold;
-            margin-top: 10px;
+            font-size: 0.78em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
         }
-
-        .difficulty-trivial { background: #4caf50; color: white; }
-        .difficulty-easy { background: #8bc34a; color: white; }
+        .difficulty-easy   { background: #4caf50; color: white; }
         .difficulty-medium { background: #ffc107; color: #333; }
-        .difficulty-hard { background: #ff9800; color: white; }
+        .difficulty-hard   { background: #ff9800; color: white; }
         .difficulty-deadly { background: #f44336; color: white; }
 
-        @media (max-width: 768px) {
-            .encounters-header h1 { font-size: 1.8em; }
+        /* Guild tags */
+        .guild-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.72em;
+            font-weight: 700;
+            text-transform: capitalize;
+            margin-right: 4px;
+        }
+        .guild-tag.azorius  { background: #cfe2ff; color: #003d82; }
+        .guild-tag.dimir    { background: #b5cce8; color: #002147; }
+        .guild-tag.rakdos   { background: #ffc1c1; color: #5a0000; }
+        .guild-tag.golgari  { background: #d4d4a8; color: #2a2a00; }
+        .guild-tag.selesnya { background: #c8e6c9; color: #1b5e20; }
+        .guild-tag.orzhov   { background: #e8e8e8; color: #212121; }
+        .guild-tag.izzet    { background: #ffe0b2; color: #e65100; }
+        .guild-tag.gruul    { background: #d7f0c8; color: #2a4a10; }
+        .guild-tag.boros    { background: #ffccbc; color: #bf360c; }
+        .guild-tag.simic    { background: #b2dfdb; color: #00695c; }
+
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
             .encounters-container { padding: 12px; }
             .encounter-panel { padding: 15px; }
-            .encounters-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
             .button-group { flex-direction: column; }
-            button { width: 100%; }
+            .encounters-grid { grid-template-columns: 1fr; }
+            .result-footer { flex-direction: column; align-items: flex-start; }
+            .reroll-btn { margin-left: 0; }
         }
     </style>
 </head>
 <body>
     <div class="encounters-header">
         <h1>Ravnica Encounter Generator</h1>
-        <p>Generate thematic encounters for your D&D 5e campaigns in Ravnica</p>
-        <button class="back-btn" onclick="window.location.href='../index.html'" title="Back to Creatures">📖 View Creatures</button>
+        <p>D&amp;D 5e</p>
+        <button class="back-btn" onclick="window.location.href='../index.html'">View Creatures</button>
     </div>
 
     <div class="encounters-container">
         <div class="encounter-panel">
-            <h2>⚙️ Encounter Configuration</h2>
-            
+            <h2>Encounter Configuration</h2>
+
             <div class="form-group">
-                <label for="environment">🏙️ Environment</label>
-                <select id="environment">
+                <label for="environment">Environment</label>
+                <select id="environment" onchange="onEnvironmentChange()">
                     <option value="">-- Select an environment --</option>
-                    <option value="azorius">🏛️ Azorius Administrative District</option>
-                    <option value="orzhov">⛪ Orzhov Cathedral</option>
-                    <option value="izzet">🧪 Izzet Laboratory</option>
-                    <option value="rakdos">🎭 Rakdos Arena</option>
-                    <option value="selesnya">🌳 Selesnya Garden</option>
-                    <option value="golgari">☠️ Golgari Catacombs</option>
-                    <option value="simic">🧬 Simic Zones</option>
-                    <option value="gruul">🪨 Gruul Territory</option>
-                    <option value="boros">Boros Garrison</option>
-                    <option value="dimir">🕵️ Dimir Cell</option>
-                    <option value="random">🎲 Random</option>
+                    <optgroup label="Single Guild">
+                        <option value="azorius">Azorius Administrative District</option>
+                        <option value="boros">Boros Legion Garrison</option>
+                        <option value="dimir">Dimir Safe House</option>
+                        <option value="golgari">Golgari Undercity Necropolis</option>
+                        <option value="gruul">Gruul Clan Territory</option>
+                        <option value="izzet">Izzet Research Laboratory</option>
+                        <option value="orzhov">Orzhov Cathedral Vault</option>
+                        <option value="rakdos">Rakdos Performance Arena</option>
+                        <option value="selesnya">Selesnya Conclave Garden</option>
+                        <option value="simic">Simic Zonot Research Hub</option>
+                    </optgroup>
+                    <optgroup label="Multi-Guild Locations">
+                        <option value="breeding_pool">Simic-Izzet Hybridization Lab</option>
+                        <option value="dead_streets">Debt Quarter (Orzhov + Golgari)</option>
+                        <option value="precinct_six">Sixth District Chaos Zone (Rakdos + Gruul)</option>
+                        <option value="sacred_foundry">Military Forge District (Boros + Izzet)</option>
+                        <option value="steam_vents">Industrial Ruins (Izzet + Gruul)</option>
+                        <option value="sunhome">Sunhome Fortress</option>
+                        <option value="tenth_district">Tenth District Streets</option>
+                        <option value="undercity">Undercity Passages (Dimir + Golgari)</option>
+                        <option value="watery_grave">Flooded Crypts (Dimir + Orzhov)</option>
+                    </optgroup>
+                    <optgroup label="Neutral Ground">
+                        <option value="ravnica_plaza">Open Market District</option>
+                    </optgroup>
+                    <option value="random">-- Random --</option>
                 </select>
+                <div id="envDescription"></div>
             </div>
 
-            <div class="form-group">
-                <label for="partySize">Party Size</label>
-                <input type="number" id="partySize" min="1" max="10" value="4" />
-            </div>
-
-            <div class="form-group">
-                <label for="partyLevel">Party Level</label>
-                <input type="number" id="partyLevel" min="1" max="20" value="1" />
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="partySize">Party Size</label>
+                    <input type="number" id="partySize" min="1" max="10" value="4" />
+                </div>
+                <div class="form-group">
+                    <label for="partyLevel">Party Level</label>
+                    <input type="number" id="partyLevel" min="1" max="20" value="1" />
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="difficulty">Desired Difficulty</label>
                 <select id="difficulty">
-                    <option value="random">🎲 Random</option>
+                    <option value="random">Random</option>
                     <option value="easy">Easy</option>
                     <option value="medium">Medium</option>
                     <option value="hard">Hard</option>
@@ -333,8 +502,8 @@
             </div>
 
             <div class="button-group">
-                <button onclick="generateEncounter()">🎲 Generate Encounter</button>
-                <button class="secondary" onclick="openCreaturesTab()">📖 View Creatures</button>
+                <button onclick="generateEncounter()">Generate Encounter</button>
+                <button class="secondary" onclick="openCreaturesTab()">View Creatures</button>
             </div>
         </div>
 
