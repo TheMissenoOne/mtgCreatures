@@ -1,115 +1,264 @@
 let CREATURES_DATABASE = null;
 let _encounterCreaturesData = [];
 
-// Environment and thematic encounter data
-const ENVIRONMENTS = {
-    azorius: {
-        name: "Azorius Administrative District",
-        icon: "🏛️",
-        description: "Government complexes, courts, infinite archives.",
-        guilds: ["Azorius"],
-        guildColors: [["W", "U"]],
-        threat: "Audit, imprisonment, or asset seizure.",
-    },
-    orzhov: {
-        name: "Orzhov Cathedral",
-        icon: "⛪",
-        description: "Luxurious basilicas that are banks, churches, and vaults.",
-        guilds: ["Orzhov"],
-        guildColors: [["W", "B"]],
-        threat: "Debt collection, binding contracts.",
-    },
-    izzet: {
-        name: "Izzet Laboratory",
-        icon: "🧪",
-        description: "Unstable and dangerous experimental towers.",
-        guilds: ["Izzet"],
-        guildColors: [["U", "R"]],
-        threat: "Experiments spiraling disastrously out of control.",
-    },
-    rakdos: {
-        name: "Rakdos Arena",
-        icon: "🎭",
-        description: "Theater, circus, ritual massacre.",
-        guilds: ["Rakdos"],
-        guildColors: [["B", "R"]],
-        threat: "Chaos, sadistic performance, bloodshed.",
-    },
-    selesnya: {
-        name: "Selesnya Garden",
-        icon: "🌳",
-        description: "Living oases within the city.",
-        guilds: ["Selesnya"],
-        guildColors: [["G", "W"]],
-        threat: "Forced incorporation, communion ritual.",
-    },
-    golgari: {
-        name: "Golgari Catacombs",
-        icon: "☠️",
-        description: "Necropolises, fungi, undead-living ecosystem.",
-        guilds: ["Golgari"],
-        guildColors: [["B", "G"]],
-        threat: "Necrophagous swarms, the undead awaken.",
-    },
-    simic: {
-        name: "Simic Zones",
-        icon: "🧬",
-        description: "Biological reserves and mutation chambers.",
-        guilds: ["Simic"],
-        guildColors: [["U", "G"]],
-        threat: "Unstable hybrids and accelerated evolution.",
-    },
-    gruul: {
-        name: "Gruul Territory",
-        icon: "🪨",
-        description: "Destroyed forests, ancient ruins, savagery.",
-        guilds: ["Gruul"],
-        guildColors: [["G", "R"]],
-        threat: "Brute fury, wild beast, destruction.",
-    },
-    boros: {
-        name: "Boros Garrison",
-        icon: "",
-        description: "Military fortresses, command post.",
-        guilds: ["Boros"],
-        guildColors: [["R", "W"]],
-        threat: "Brutal enforcement of martial law.",
-    },
-    dimir: {
-        name: "Dimir Cell",
-        icon: "🕵️",
-        description: "Hidden spaces, forbidden libraries.",
-        guilds: ["Dimir"],
-        guildColors: [["U", "B"]],
-        threat: "Infiltration, secret assassination, stolen memories.",
-    }
+const GUILD_COLORS = {
+    azorius: ["W", "U"],
+    dimir:   ["U", "B"],
+    rakdos:  ["B", "R"],
+    golgari: ["B", "G"],
+    selesnya:["G", "W"],
+    orzhov:  ["W", "B"],
+    izzet:   ["U", "R"],
+    gruul:   ["R", "G"],
+    boros:   ["R", "W"],
+    simic:   ["U", "G"],
 };
 
-const GUILD_COLORS = {
-    "Azorius": ["W", "U"],
-    "Dimir": ["U", "B"],
-    "Rakdos": ["B", "R"],
-    "Golgari": ["B", "G"],
-    "Selesnya": ["G", "W"],
-    "Orzhov": ["W", "B"],
-    "Izzet": ["U", "R"],
-    "Gruul": ["R", "G"],
-    "Boros": ["R", "W"],
-    "Simic": ["U", "G"]
+const ENVIRONMENTS = {
+    // Single guild
+    azorius: {
+        name: "Azorius Administrative District",
+        subtitle: "Courts, infinite archives, and enforcement precincts",
+        guilds: ["azorius"],
+        threat: "Arrest warrants, magical binding, and asset seizure.",
+        hooks: [
+            "The party is summoned to answer for a legal violation they may not have committed.",
+            "A dissident is detained without trial — someone wants them silenced before the hearing.",
+            "A Lawmage has gone rogue and is rewriting city ordinances to consolidate power.",
+        ]
+    },
+    orzhov: {
+        name: "Orzhov Cathedral Vault",
+        subtitle: "Gilded basilicas that serve as banks, churches, and debtors' prisons",
+        guilds: ["orzhov"],
+        threat: "Debt binding, spectral enforcers, and centuries-old contracts.",
+        hooks: [
+            "A debt the party did not know they owed has been called in, with compound interest.",
+            "A ghost thrall is attempting to break free from its service contract and needs protection.",
+            "The Orzhov want something retrieved from their own sealed lower vault, which they dare not enter.",
+        ]
+    },
+    izzet: {
+        name: "Izzet Research Laboratory",
+        subtitle: "Volatile towers of experimental thaumaturgy",
+        guilds: ["izzet"],
+        threat: "Containment breach, magical overload, and collateral detonation.",
+        hooks: [
+            "A portal experiment has fused two laboratory wings and something came through.",
+            "A mage has been conducting unauthorized memory extraction on unwilling subjects.",
+            "A new weapon prototype has gone fully active and the mage who built it is missing.",
+        ]
+    },
+    rakdos: {
+        name: "Rakdos Performance Arena",
+        subtitle: "Blood theater, sadistic spectacle, and ritual carnival grounds",
+        guilds: ["rakdos"],
+        threat: "Audience frenzy, performers who kill for sport, and ritual chaos.",
+        hooks: [
+            "The party has been volunteered as tonight's featured act without their knowledge.",
+            "A Rakdos performer is harboring a fugitive and the guild leadership does not know.",
+            "The ringmaster's latest ritual is drawing on something far older than the Cult.",
+        ]
+    },
+    selesnya: {
+        name: "Selesnya Conclave Garden",
+        subtitle: "Vast living oases sheltering tens of thousands of willing members",
+        guilds: ["selesnya"],
+        threat: "Forced communion, psychic merging, and collective enforcement.",
+        hooks: [
+            "Pilgrims are vanishing inside the garden. The Conclave says they simply joined the chorus.",
+            "A dryad elder has gone silent and the grove around her is visibly dying.",
+            "The Conclave is mobilizing an unusually large force and will not say why.",
+        ]
+    },
+    golgari: {
+        name: "Golgari Undercity Necropolis",
+        subtitle: "Fungal warrens and undead-living ecosystems beneath the streets",
+        guilds: ["golgari"],
+        threat: "Necrophagous swarms, rot shambler awakenings, and reclamation rites.",
+        hooks: [
+            "A body the party is searching for has already been reclaimed, revived, and deployed.",
+            "The Golgari are preparing a great Rot Harvest and are short on raw material.",
+            "A section of the necropolis has been sealed. Nothing enters. Nothing leaves.",
+        ]
+    },
+    simic: {
+        name: "Simic Zonot Research Hub",
+        subtitle: "Deep-water biomes and mutation chambers operated by the Combine",
+        guilds: ["simic"],
+        threat: "Unstable hybrids, accelerated evolution, and predator containment failure.",
+        hooks: [
+            "A krasis has been sighted moving through the city canal system toward the surface.",
+            "A researcher has fused with their experiment and the process cannot be reversed.",
+            "The Combine is offering free augmentation to debtors. The procedure is irreversible.",
+        ]
+    },
+    gruul: {
+        name: "Gruul Clan Territory",
+        subtitle: "Overgrown ruins, smashed infrastructure, and contested wild zones",
+        guilds: ["gruul"],
+        threat: "Clan raids, beast stampedes, and ritual combat challenges.",
+        hooks: [
+            "A Gruul shaman claims the land beneath a city block is sacred and will prove it tonight.",
+            "Something is driving the clans into the city in unprecedented numbers.",
+            "A young chieftain wants to negotiate peace. The elder clans intend to stop them.",
+        ]
+    },
+    boros: {
+        name: "Boros Legion Garrison",
+        subtitle: "Military precincts and armored fortresses of the angelic legion",
+        guilds: ["boros"],
+        threat: "Martial law, angel-commanded strikes, and collateral enforcement.",
+        hooks: [
+            "The garrison is on full alert after an armory theft and the party is considered suspect.",
+            "A Boros captain has gone off-order and is executing civilians without sanction.",
+            "Legion soldiers are disappearing from their posts. No bodies, no signs of struggle.",
+        ]
+    },
+    dimir: {
+        name: "Dimir Safe House",
+        subtitle: "Subterranean cells, forbidden libraries, and shadow networks",
+        guilds: ["dimir"],
+        threat: "Infiltration, memory theft, and assassination before dawn.",
+        hooks: [
+            "The party holds information the Dimir believe only they should possess.",
+            "A known spy has offered to defect, but every handler they contact turns up dead.",
+            "Someone is selling Dimir intelligence. The guild wants the seller found before the buyer does.",
+        ]
+    },
+    // Multi-guild locations
+    undercity: {
+        name: "Undercity Passages",
+        subtitle: "Contested fungal tunnels where Dimir and Golgari interests collide",
+        guilds: ["dimir", "golgari"],
+        threat: "Memory-stealing fog, rot-creature patrols, and flooded dead ends.",
+        hooks: [
+            "A sealed chamber has been breached. Both guilds want what is inside and neither will say what it is.",
+            "Something is moving through the lower tunnels that is neither Dimir nor Golgari work.",
+            "A cartographer has gone missing with the only complete map of the lower passages.",
+        ]
+    },
+    steam_vents: {
+        name: "Industrial Ruins",
+        subtitle: "Izzet-abandoned workshops now claimed by Gruul clans",
+        guilds: ["izzet", "gruul"],
+        threat: "Unstable magitech traps, territorial beasts, and volatile residue.",
+        hooks: [
+            "An Izzet prototype weapon was left behind when the lab was abandoned. The Gruul have figured out how to use it.",
+            "The ruins sit on a power conduit the Izzet need reclaimed. The Gruul will not move.",
+            "Something buried under the workshop floor is waking up.",
+        ]
+    },
+    sacred_foundry: {
+        name: "Military Forge District",
+        subtitle: "Boros-Izzet joint forges producing weapons and armor for the Legion",
+        guilds: ["boros", "izzet"],
+        threat: "Experimental ordnance, angel-supervised security, and internal sabotage.",
+        hooks: [
+            "A weapons shipment has been redirected. Both guilds blame each other.",
+            "An Izzet modification to standard Legion armor has been quietly killing soldiers.",
+            "The party must escort a prototype weapon through a forge district under active assault.",
+        ]
+    },
+    watery_grave: {
+        name: "Flooded Crypts",
+        subtitle: "Drowned Orzhov vaults where Dimir archivists pick through the secrets of the dead",
+        guilds: ["dimir", "orzhov"],
+        threat: "Trapped spirits, flooded corridors, and layered wards protecting buried leverage.",
+        hooks: [
+            "A debt ledger sealed in a flooded vault could expose both guilds. Both want it destroyed.",
+            "The ghost of a high-ranking prelate will not rest and is revealing Dimir secrets in its ravings.",
+            "A missing Dimir agent was last seen entering an Orzhov crypt. That was three days ago.",
+        ]
+    },
+    dead_streets: {
+        name: "Debt Quarter",
+        subtitle: "Orzhov-controlled streets where Golgari reclaim the abandoned dead",
+        guilds: ["orzhov", "golgari"],
+        threat: "Spectral debt collectors, rot shambler patrols, and binding contracts enforced by force.",
+        hooks: [
+            "The Orzhov are harvesting their own indebted dead before the Golgari can claim the bodies.",
+            "A living debtor has accepted Golgari sanctuary. The Orzhov have sent collectors.",
+            "An entire street has been sealed off with no explanation. Locals say the dead walk there at night.",
+        ]
+    },
+    breeding_pool: {
+        name: "Simic-Izzet Hybridization Lab",
+        subtitle: "Joint experimental facility where biological and arcane science collide",
+        guilds: ["simic", "izzet"],
+        threat: "Failed hybrids, arcane feedback loops, and escaped test subjects.",
+        hooks: [
+            "A joint experiment has produced something neither guild designed. It is still growing.",
+            "Test subjects have developed a shared intelligence and are coordinating an escape.",
+            "The facility's lead researcher has gone silent. Their final log entry reads: It works. Do not come in.",
+        ]
+    },
+    precinct_six: {
+        name: "Sixth District Chaos Zone",
+        subtitle: "Lower city blocks where Rakdos carnivals and Gruul incursions converge",
+        guilds: ["rakdos", "gruul"],
+        threat: "Mob violence, performer attacks, and clan-carnival territorial clashes.",
+        hooks: [
+            "A Rakdos parade and a Gruul raid arrived at the same city block at the same time.",
+            "Someone has been hiring Gruul as muscle for Rakdos performances and paying in stolen weapons.",
+            "A Gruul elder and a Rakdos demon are both claiming the same ancient ruin as sacred ground.",
+        ]
+    },
+    tenth_district: {
+        name: "Tenth District Streets",
+        subtitle: "The most populated district in Ravnica, contested by Boros, Azorius, and Selesnya",
+        guilds: ["boros", "azorius", "selesnya"],
+        threat: "Civilian crossfire, competing guild jurisdiction, and public order collapse.",
+        hooks: [
+            "Three guild patrols converge on the same block, each carrying conflicting orders.",
+            "A public gathering has been infiltrated by a guild agent. No one agrees which guild sent them.",
+            "A building collapse has trapped civilians and the guilds are arguing over jurisdiction rather than helping.",
+        ]
+    },
+    sunhome: {
+        name: "Sunhome Fortress",
+        subtitle: "The Boros Legion's great central stronghold and command center",
+        guilds: ["boros"],
+        threat: "Angelic command authority, fortress lockdown, and Legion rapid response.",
+        hooks: [
+            "Someone has breached Sunhome's inner sanctum. The angels have sealed the fortress.",
+            "A holy relic kept in Sunhome has started producing effects no one can identify or stop.",
+            "A high-ranking angel has issued orders that contradict Legion doctrine. No one dares question it.",
+        ]
+    },
+    ravnica_plaza: {
+        name: "Open Market District",
+        subtitle: "Neutral ground where all guilds trade, spy, and scheme in plain sight",
+        guilds: ["any"],
+        threat: "Anything. Every guild maintains a presence here.",
+        hooks: [
+            "A public assassination has occurred and every guild has a different suspect in mind.",
+            "Stolen goods from multiple guilds are surfacing at the same merchant stall.",
+            "The market has been placed under Azorius quarantine. No one will say why.",
+        ]
+    },
 };
 
 const CR_XP_VALUES = {
-    0: 10, "1/8": 25, "1/4": 50, "1/2": 100, 1: 200, 2: 450, 3: 700, 4: 1100,
-    5: 1800, 6: 2300, 7: 2900, 8: 3900, 9: 5000, 10: 5900, 11: 7200, 12: 8400,
-    13: 10000, 14: 11500, 15: 13000, 16: 15000, 17: 18000, 18: 20000, 19: 22000,
-    20: 25000, 21: 33000, 22: 41000, 23: 50000, 24: 62000, 25: 75000, 26: 90000,
-    27: 105000, 28: 120000, 29: 135000, 30: 155000
+    0: 10, "1/8": 25, "1/4": 50, "1/2": 100,
+    1: 200, 2: 450, 3: 700, 4: 1100,
+    5: 1800, 6: 2300, 7: 2900, 8: 3900, 9: 5000, 10: 5900,
+    11: 7200, 12: 8400, 13: 10000, 14: 11500, 15: 13000,
+    16: 15000, 17: 18000, 18: 20000, 19: 22000, 20: 25000,
+    21: 33000, 22: 41000, 23: 50000, 24: 62000, 25: 75000,
+    26: 90000, 27: 105000, 28: 120000, 29: 135000, 30: 155000
 };
 
+function xpForCR(numericCR, rawCRStr) {
+    // Try exact string key first ("1/4", "1/2", "1/8")
+    if (rawCRStr && CR_XP_VALUES[rawCRStr] !== undefined) return CR_XP_VALUES[rawCRStr];
+    // Then integer key
+    const rounded = Math.round(numericCR);
+    return CR_XP_VALUES[rounded] || 100;
+}
 
 async function loadCreatures() {
     if (CREATURES_DATABASE) return CREATURES_DATABASE;
-    
     try {
         const response = await fetch('../data/output/final.json');
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -121,184 +270,163 @@ async function loadCreatures() {
     }
 }
 
-// Convert colors array to guild key: ['W', 'U'] => 'azorius'
+// Convert colors array to lowercase guild key: ['W', 'U'] => 'azorius'
 function colorsToGuild(colors) {
     if (!colors || colors.length !== 2) return null;
-    
     const sorted = [...colors].sort().join('');
-    const colorCombos = {
-        'UW': 'azorius', // sorted U,W
-        'BU': 'dimir',  // B,U
-        'BR': 'rakdos',
-        'BG': 'golgari',
-        'GW': 'selesnya',
-        'BW': 'orzhov',
-        'RU': 'izzet',  // sorted R,U
-        'GR': 'gruul',
-        'RW': 'boros',
-        'GU': 'simic'
+    const map = {
+        'UW': 'azorius', 'BU': 'dimir', 'BR': 'rakdos',
+        'BG': 'golgari', 'GW': 'selesnya', 'BW': 'orzhov',
+        'RU': 'izzet', 'GR': 'gruul', 'RW': 'boros', 'GU': 'simic'
     };
-    return colorCombos[sorted];
+    return map[sorted] || null;
 }
 
-// Extract numeric CR from string like "8 (3900 XP)" or "1/4 (50 XP)"
+// Extract numeric CR and raw CR string from challenge string
 function parseCR(challengeStr) {
-    if (!challengeStr) return 0;
+    if (!challengeStr) return { num: 0, raw: '0' };
     const match = challengeStr.match(/^([\d/\.]+)/);
-    if (!match) return 0;
+    if (!match) return { num: 0, raw: '0' };
     const raw = match[1];
     if (raw.includes('/')) {
         const [a, b] = raw.split('/');
-        return parseInt(a) / parseInt(b);
+        return { num: parseInt(a) / parseInt(b), raw };
     }
-    return parseFloat(raw);
+    return { num: parseFloat(raw), raw };
 }
 
-// Filter creatures by guild and CR range
-function filterCreaturesByGuildAndCR(creatures, guildKey, minCR, maxCR) {
+function filterCreaturesForEnvironment(creatures, envKey, minCR, maxCR) {
+    const env = ENVIRONMENTS[envKey];
+    if (!env) return [];
+
+    const guilds = env.guilds;
+    const anyGuild = guilds.includes('any');
+
+    // Build set of all single colors belonging to this environment's guilds
+    const envColors = new Set();
+    if (!anyGuild) {
+        for (const g of guilds) {
+            (GUILD_COLORS[g] || []).forEach(c => envColors.add(c));
+        }
+    }
+
     const filtered = [];
-    
-    // Mono-color creatures for each guild
-    const guildMono = {
-        'azorius': 'W', 'dimir': 'U', 'rakdos': 'B', 'golgari': 'G', 'selesnya': 'W',
-        'orzhov': 'B', 'izzet': 'U', 'gruul': 'R', 'boros': 'R', 'simic': 'U'
-    };
-    
     for (const creature of Object.values(creatures)) {
+        const { num: cr, raw: rawCR } = parseCR(creature.Challenge);
+        if (cr < minCR || cr > maxCR) continue;
+
         const colors = creature.colors || [];
-        let matches = false;
-        
-        const creatureGuild = colorsToGuild(colors);
-        if (creatureGuild === guildKey) {
-            matches = true;
-        } else if (colors.length === 1) {
-            const guildColor = guildMono[guildKey];
-            if (colors[0] === guildColor) {
+        let matches = anyGuild;
+
+        if (!matches) {
+            const creatureGuild = colorsToGuild(colors);
+            if (creatureGuild && guilds.includes(creatureGuild)) {
+                matches = true;
+            } else if (colors.length === 1 && envColors.has(colors[0])) {
                 matches = true;
             }
         }
-        
+
         if (matches) {
-            const cr = parseFloat(parseCR(creature.Challenge));
-            if (cr >= minCR && cr <= maxCR) {
-                filtered.push({
-                    data: creature,
-                    name: creature.name,
-                    cr: cr,
-                    challenge: creature.Challenge,
-                    xp: CR_XP_VALUES[cr] || 100,
-                    colors: colors,
-                    traits: creature.Traits || ""
-                });
-            }
+            filtered.push({
+                data: creature,
+                name: creature.name,
+                cr,
+                rawCR,
+                challenge: creature.Challenge,
+                xp: xpForCR(cr, rawCR),
+                colors,
+            });
         }
     }
-    
     return filtered;
 }
 
-// Calculate XP thresholds by level and party size
 function calculateThresholds(partyLevel, partySize) {
     const xpByLevel = {
-        1:  { easy: 25,   medium: 50,   hard: 75,   deadly: 100  },
-        2:  { easy: 50,   medium: 100,  hard: 150,  deadly: 200  },
-        3:  { easy: 75,   medium: 150,  hard: 225,  deadly: 400  },
-        4:  { easy: 125,  medium: 250,  hard: 375,  deadly: 500  },
-        5:  { easy: 250,  medium: 500,  hard: 750,  deadly: 1100 },
-        6:  { easy: 300,  medium: 600,  hard: 900,  deadly: 1400 },
-        7:  { easy: 350,  medium: 750,  hard: 1100, deadly: 1700 },
-        8:  { easy: 450,  medium: 900,  hard: 1400, deadly: 2100 },
-        9:  { easy: 550,  medium: 1100, hard: 1600, deadly: 2400 },
-        10: { easy: 600,  medium: 1200, hard: 1900, deadly: 2800 },
-        11: { easy: 800,  medium: 1600, hard: 2400, deadly: 3600 },
-        12: { easy: 1000, medium: 2000, hard: 3000, deadly: 4500 },
-        13: { easy: 1100, medium: 2200, hard: 3300, deadly: 5100 },
-        14: { easy: 1250, medium: 2500, hard: 3800, deadly: 5700 },
-        15: { easy: 1400, medium: 2800, hard: 4200, deadly: 6300 },
-        16: { easy: 1600, medium: 3200, hard: 4800, deadly: 7200 },
-        17: { easy: 2000, medium: 3900, hard: 5900, deadly: 9500 },
-        18: { easy: 2100, medium: 4200, hard: 6300, deadly: 9500 },
-        19: { easy: 2400, medium: 4900, hard: 7300, deadly: 9500 },
+        1:  { easy: 25,   medium: 50,   hard: 75,   deadly: 100   },
+        2:  { easy: 50,   medium: 100,  hard: 150,  deadly: 200   },
+        3:  { easy: 75,   medium: 150,  hard: 225,  deadly: 400   },
+        4:  { easy: 125,  medium: 250,  hard: 375,  deadly: 500   },
+        5:  { easy: 250,  medium: 500,  hard: 750,  deadly: 1100  },
+        6:  { easy: 300,  medium: 600,  hard: 900,  deadly: 1400  },
+        7:  { easy: 350,  medium: 750,  hard: 1100, deadly: 1700  },
+        8:  { easy: 450,  medium: 900,  hard: 1400, deadly: 2100  },
+        9:  { easy: 550,  medium: 1100, hard: 1600, deadly: 2400  },
+        10: { easy: 600,  medium: 1200, hard: 1900, deadly: 2800  },
+        11: { easy: 800,  medium: 1600, hard: 2400, deadly: 3600  },
+        12: { easy: 1000, medium: 2000, hard: 3000, deadly: 4500  },
+        13: { easy: 1100, medium: 2200, hard: 3300, deadly: 5100  },
+        14: { easy: 1250, medium: 2500, hard: 3800, deadly: 5700  },
+        15: { easy: 1400, medium: 2800, hard: 4200, deadly: 6300  },
+        16: { easy: 1600, medium: 3200, hard: 4800, deadly: 7200  },
+        17: { easy: 2000, medium: 3900, hard: 5900, deadly: 9500  },
+        18: { easy: 2100, medium: 4200, hard: 6300, deadly: 9500  },
+        19: { easy: 2400, medium: 4900, hard: 7300, deadly: 9500  },
         20: { easy: 2800, medium: 5700, hard: 8500, deadly: 10900 },
     };
-
     const baseXp = xpByLevel[Math.min(Math.max(partyLevel, 1), 20)];
-    const multiplier = partySize / 4;
-
+    const m = partySize / 4;
     return {
-        easy: Math.floor(baseXp.easy * multiplier),
-        medium: Math.floor(baseXp.medium * multiplier),
-        hard: Math.floor(baseXp.hard * multiplier),
-        deadly: Math.floor(baseXp.deadly * multiplier)
+        easy:   Math.floor(baseXp.easy   * m),
+        medium: Math.floor(baseXp.medium * m),
+        hard:   Math.floor(baseXp.hard   * m),
+        deadly: Math.floor(baseXp.deadly * m),
     };
 }
 
-// Select random difficulty with weights
 function selectRandomDifficulty() {
-    const difficulties = ["easy", "medium", "hard", "deadly"];
+    const opts = ["easy", "medium", "hard", "deadly"];
     const weights = [3, 5, 4, 2];
-    const random = Math.random() * weights.reduce((a, b) => a + b);
-    
-    let sum = 0;
-    for (let i = 0; i < difficulties.length; i++) {
-        sum += weights[i];
-        if (random <= sum) return difficulties[i];
+    const total = weights.reduce((a, b) => a + b, 0);
+    let r = Math.random() * total;
+    for (let i = 0; i < opts.length; i++) {
+        r -= weights[i];
+        if (r <= 0) return opts[i];
     }
     return "medium";
 }
 
-function formatDifficulty(difficulty) {
-    const labels = {
-        easy: "Easy",
-        medium: "Medium",
-        hard: "Hard",
-        deadly: "Deadly"
-    };
-    return labels[difficulty] || difficulty;
+function formatDifficulty(d) {
+    return { easy: "Easy", medium: "Medium", hard: "Hard", deadly: "Deadly" }[d] || d;
 }
 
-async function selectCreaturesForEncounter(guildKey, targetXP, partyLevel, difficulty) {
+function randomHook(env) {
+    if (!env.hooks || !env.hooks.length) return null;
+    return env.hooks[Math.floor(Math.random() * env.hooks.length)];
+}
+
+async function selectCreaturesForEncounter(envKey, targetXP, partyLevel, difficulty) {
     const creatures = await loadCreatures();
     if (!creatures) return [];
 
-    const crMultiplier = {
-        "easy": 0.5,
-        "medium": 1,
-        "hard": 1.5,
-        "deadly": 2
-    }[difficulty] || 1;
-    
-    const baseTargetCR = partyLevel * crMultiplier;
-    const crVariance = 2 + (partyLevel / 5);
-    let minCR = Math.max(0, baseTargetCR - crVariance);
-    let maxCR = baseTargetCR + crVariance;
-    
-    let availableCreatures = filterCreaturesByGuildAndCR(creatures, guildKey, minCR, maxCR);
-    
-    if (availableCreatures.length === 0) {
-        availableCreatures = filterCreaturesByGuildAndCR(creatures, guildKey, 0, 30);
+    const crMult = { easy: 0.5, medium: 1, hard: 1.5, deadly: 2 }[difficulty] || 1;
+    const baseCR = partyLevel * crMult;
+    const variance = 2 + partyLevel / 5;
+    const minCR = Math.max(0, baseCR - variance);
+    const maxCR = baseCR + variance;
+
+    let pool = filterCreaturesForEnvironment(creatures, envKey, minCR, maxCR);
+
+    if (!pool.length) {
+        pool = filterCreaturesForEnvironment(creatures, envKey, 0, 30);
     }
-    if (availableCreatures.length === 0) {
-        const allGuilds = Object.keys(ENVIRONMENTS).filter(k => k !== 'random');
-        for (const guild of allGuilds) {
-            availableCreatures = filterCreaturesByGuildAndCR(creatures, guild, minCR, maxCR);
-            if (availableCreatures.length > 0) break;
-        }
+    // Final fallback: open market (any creature) in CR range
+    if (!pool.length) {
+        pool = filterCreaturesForEnvironment(creatures, 'ravnica_plaza', minCR, maxCR);
     }
-    
+
+    const shuffled = [...pool].sort(() => Math.random() - 0.5);
     const selected = [];
-    let totalXP = 0;
-    const shuffled = availableCreatures.sort(() => Math.random() - 0.5);
-    
-    for (const creature of shuffled) {
-        if (totalXP + creature.xp <= targetXP * 1.5) {
-            selected.push(creature);
-            totalXP += creature.xp;
+    let total = 0;
+    for (const c of shuffled) {
+        if (total + c.xp <= targetXP * 1.5) {
+            selected.push(c);
+            total += c.xp;
         }
         if (selected.length >= 4) break;
     }
-    
-    return selected.length > 0 ? selected : shuffled.slice(0, Math.min(2, shuffled.length));
+    return selected.length ? selected : shuffled.slice(0, Math.min(2, shuffled.length));
 }
 
 async function generateEncounter() {
@@ -307,90 +435,78 @@ async function generateEncounter() {
     const partyLevel = parseInt(document.getElementById("partyLevel").value) || 1;
     const difficultySelect = document.getElementById("difficulty").value;
 
-    if (!envSelect.value || envSelect.value === "") {
-        alert("Please select an environment!");
+    if (!envSelect.value) {
+        alert("Select an environment first.");
         return;
     }
 
-    let environmentKey = envSelect.value;
-    if (environmentKey === "random") {
+    let envKey = envSelect.value;
+    if (envKey === "random") {
         const keys = Object.keys(ENVIRONMENTS);
-        environmentKey = keys[Math.floor(Math.random() * keys.length)];
+        envKey = keys[Math.floor(Math.random() * keys.length)];
     }
 
-    const environment = ENVIRONMENTS[environmentKey];
-    let difficulty = difficultySelect;
-    if (difficulty === "random") {
-        difficulty = selectRandomDifficulty();
-    }
-
+    const env = ENVIRONMENTS[envKey];
+    const difficulty = difficultySelect === "random" ? selectRandomDifficulty() : difficultySelect;
     const thresholds = calculateThresholds(partyLevel, partySize);
     const targetXP = thresholds[difficulty];
-    
-    const encounterCreatures = await selectCreaturesForEncounter(
-        environmentKey, targetXP, partyLevel, difficulty
-    );
-    
-    const totalXP = encounterCreatures.reduce((sum, c) => sum + c.xp, 0);
-    const adjustedXP = totalXP * (partySize / 4);
 
-    const creaturesHTML = encounterCreatures.map((c, i) => {
+    const creatures = await selectCreaturesForEncounter(envKey, targetXP, partyLevel, difficulty);
+    const totalXP = creatures.reduce((s, c) => s + c.xp, 0);
+    const adjustedXP = Math.round(totalXP * (partySize / 4));
+    const hook = randomHook(env);
+
+    _encounterCreaturesData = creatures;
+
+    const creaturesHTML = creatures.map((c, i) => {
         const artUrl = c.data.image_uris?.art_crop || '';
         const thumbStyle = artUrl
-            ? `background-image:url(${artUrl});background-size:cover;background-position:center;`
-            : 'background:#2d3561;';
-        return `
-        <div class="encounter-card" onclick="toggleStatBlock(this, ${i})">
-            <div style="display:flex;align-items:center;gap:10px;">
-                <div style="width:48px;height:48px;border-radius:4px;flex-shrink:0;${thumbStyle}"></div>
-                <div>
+            ? `background-image:url(${artUrl});background-size:cover;background-position:center top;`
+            : 'background:#1c2230;';
+        const guilds = env.guilds.includes('any') ? '' :
+            env.guilds.map(g => `<span class="guild-tag ${g}">${g}</span>`).join('');
+        return `<div class="encounter-card" onclick="toggleStatBlock(this,${i})">
+            <div class="encounter-card-header">
+                <div class="encounter-card-thumb" style="${thumbStyle}"></div>
+                <div class="encounter-card-info">
                     <strong>${c.name}</strong>
-                    <div style="font-size:0.85em;color:#aaa;margin-top:2px;">CR ${c.cr} &bull; ${c.xp} XP &bull; ${c.data.meta || ''}</div>
+                    <div class="encounter-card-meta">CR ${c.rawCR} &bull; ${c.xp} XP &bull; ${c.data.meta || ''}</div>
                 </div>
-                <span class="expand-arrow" style="margin-left:auto;color:#667eea;font-size:1.1em;">&#9660;</span>
+                <span class="expand-arrow">&#9660;</span>
             </div>
-            <div class="statblock-expand" style="display:none;margin-top:10px;"></div>
+            <div class="statblock-expand" style="display:none;margin-top:12px;"></div>
         </div>`;
     }).join('');
 
-    let html = `
-        <div class="environment-info">
-            <strong>${environment.icon} ${environment.name}</strong>
-            <p><em>${environment.description}</em></p>
+    const html = `
+        <div class="result-env">
+            <div class="result-env-name">${env.name}</div>
+            <div class="result-env-sub">${env.subtitle}</div>
         </div>
-
-        <div style="background:rgba(102,126,234,0.15);border-radius:4px;padding:15px;margin:15px 0;border-left:4px solid #667eea;">
-            <strong style="color:#667eea;font-size:1.1em;">Encounter Creatures</strong>
-            <div class="encounters-grid" style="margin-top:10px;">${creaturesHTML}</div>
+        ${hook ? `<div class="result-hook"><span class="result-hook-label">Adventure Hook</span>${hook}</div>` : ''}
+        <div class="result-section">
+            <div class="result-section-label">Encounter Creatures</div>
+            <div class="encounters-grid">${creaturesHTML}</div>
         </div>
-
-        <div style="background:rgba(0,0,0,0.3);border-radius:4px;padding:15px;margin:15px 0;border-left:3px solid #764ba2;">
-            <strong style="color:#764ba2;">Statistics</strong>
-            <p style="margin:10px 0 0 0;color:#aaa;">
-                Raw XP: ${totalXP} &bull; Adjusted (${partySize} PCs): ${adjustedXP.toFixed(0)}<br>
-                Threshold ${difficulty.toUpperCase()}: ${targetXP} XP<br>
-                Threat: <em>${environment.threat}</em>
-            </p>
+        <div class="result-section result-stats">
+            <div class="result-section-label">Statistics</div>
+            <div class="stat-row">
+                <span class="stat-item"><span class="stat-key">Raw XP</span>${totalXP}</span>
+                <span class="stat-item"><span class="stat-key">Adjusted (${partySize} players)</span>${adjustedXP}</span>
+                <span class="stat-item"><span class="stat-key">${difficulty.toUpperCase()} threshold</span>${targetXP} XP</span>
+            </div>
+            <div class="stat-threat"><span class="stat-key">Threat</span>${env.threat}</div>
         </div>
-
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:15px;align-items:center;">
+        <div class="result-footer">
             <span class="difficulty-indicator difficulty-${difficulty}">${formatDifficulty(difficulty)}</span>
-            <span style="color:#aaa;">${partySize} players &bull; Level ${partyLevel}</span>
-        </div>
-
-        <div style="margin-top:20px;">
-            <button onclick="openCreaturesTab()" style="background:#667eea;color:white;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-weight:600;">
-                View All Creatures
-            </button>
+            <span class="footer-party">${partySize} players &bull; Level ${partyLevel}</span>
+            <button class="reroll-btn" onclick="generateEncounter()">Roll Again</button>
         </div>
     `;
 
-    _encounterCreaturesData = encounterCreatures;
-
-    document.getElementById("encounterTitle").textContent = `Encounter in ${environment.name}`;
+    document.getElementById("encounterTitle").textContent = `Encounter — ${env.name}`;
     document.getElementById("encounterContent").innerHTML = html;
     document.getElementById("encounterResult").classList.add("visible");
-
     setTimeout(() => {
         document.getElementById("encounterResult").scrollIntoView({ behavior: "smooth" });
     }, 100);
@@ -439,11 +555,29 @@ function toggleStatBlock(card, idx) {
           ${traits}<h3>Actions</h3>${actions}
         </stat-block>`;
         expand.style.display = 'block';
-        if (arrow) arrow.innerHTML = '&#9650;';
+        if (arrow) arrow.textContent = '▲';
     } else {
         expand.style.display = 'none';
-        if (arrow) arrow.innerHTML = '&#9660;';
+        if (arrow) arrow.textContent = '▼';
     }
+}
+
+// Populate environment description on select change
+function onEnvironmentChange() {
+    const key = document.getElementById("environment").value;
+    const box = document.getElementById("envDescription");
+    if (!box) return;
+    if (!key || key === 'random' || !ENVIRONMENTS[key]) {
+        box.style.display = 'none';
+        return;
+    }
+    const env = ENVIRONMENTS[key];
+    const guildsLabel = env.guilds.includes('any') ? 'All guilds' :
+        env.guilds.map(g => g.charAt(0).toUpperCase() + g.slice(1)).join(' + ');
+    box.innerHTML = `<div class="env-desc-name">${env.name}</div>
+        <div class="env-desc-sub">${env.subtitle}</div>
+        <div class="env-desc-guilds">Guilds: ${guildsLabel}</div>`;
+    box.style.display = 'block';
 }
 
 document.addEventListener("keypress", e => {
@@ -451,6 +585,7 @@ document.addEventListener("keypress", e => {
 });
 
 window.addEventListener('load', () => {
+    document.getElementById("environment").addEventListener("change", onEnvironmentChange);
     loadCreatures().then(data => {
         if (data) console.log(`${Object.keys(data).length} creatures loaded`);
     });

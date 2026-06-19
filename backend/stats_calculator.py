@@ -513,14 +513,13 @@ def apply_trait_adjustments(
     hp_multiplier = 1.0
     save_dc_delta = 0
     
-    # Apply keyword adjustments (prioritize by cost: cheapest first)
+    # Apply keyword adjustments (cheapest first; skip entries without a cost field)
     keyword_data = [
         (kw, KEYWORD_BALANCE.get(kw, {}))
         for kw in keywords
-        if kw in KEYWORD_BALANCE
+        if kw in KEYWORD_BALANCE and "cost" in KEYWORD_BALANCE.get(kw, {})
     ]
-    # Sort by cost (ascending): apply cheaper traits first within budget
-    keyword_data.sort(key=lambda x: x[1].get("cost", 999))
+    keyword_data.sort(key=lambda x: x[1].get("cost", 1))
     
     for keyword, balance in keyword_data:
         trait_cost = balance.get("cost", 1)
@@ -539,14 +538,13 @@ def apply_trait_adjustments(
             if balance.get("hp_multiplier", 1.0) != 1.0:
                 hp_multiplier *= balance.get("hp_multiplier", 1.0)
     
-    # Apply color trait adjustments (also respects budget)
+    # Apply color trait adjustments (also respects budget; skip entries without cost)
     color_trait_data = [
         (ct, COLOR_TRAIT_BALANCE.get(ct, {}))
         for ct in color_traits
-        if ct in COLOR_TRAIT_BALANCE
+        if ct in COLOR_TRAIT_BALANCE and "cost" in COLOR_TRAIT_BALANCE.get(ct, {})
     ]
-    # Sort by cost (ascending): apply cheaper traits first within budget
-    color_trait_data.sort(key=lambda x: x[1].get("cost", 999))
+    color_trait_data.sort(key=lambda x: x[1].get("cost", 1))
     
     for color_trait, balance in color_trait_data:
         trait_cost = balance.get("cost", 1)

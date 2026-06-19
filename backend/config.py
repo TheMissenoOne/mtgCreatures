@@ -506,96 +506,6 @@ KEYWORD_BALANCE = {
                       "mechanism": "Limiting (Can't Attack)",
                       "notes": "Não pode atacar normalmente; papel de tanque/segurador. Cannot use melee attacks; immune to forced movement."},
 
-    # Ravnica-specific / blocks
-    "Forecast":      {"cr_offense": 0.25, "cr_defense": 0.10, "dpr_bonus": 1.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Pequeno efeito ativado no início do turno; utilitário contínuo."},
-
-    "Radiance":      {"cr_offense": 1.00, "cr_defense": 0.0, "dpr_bonus": 3.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Efeito que se espalha — transforma alvo único em múltiplos alvos. Use com cuidado: pode ser +1 CR quando afeta 2+ alvos."},
-
-    "Transmute":     {"cr_offense": 0.20, "cr_defense": 0.10, "dpr_bonus": 0.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Troca de efeitos (utility); pouco impacto direto no CR."},
-
-    "Dredge":        {"cr_offense": 0.10, "cr_defense": 1.00, "dpr_bonus": 0.5, "hp_delta": 10, "save_dc_delta": 0,
-                      "notes": "Recursão de habilidades: aumenta resiliência, adicionar HP plano para refletir recuperação; escalável."},
-
-    "Bloodthirst":   {"cr_offense": 0.50, "cr_defense": 0.0, "dpr_bonus": 2.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Entra em combate com bônus se um oponente foi ferido — situacional, use quando apropriado."},
-
-    "Replicate":     {"cr_offense": 1.00, "cr_defense": 0.0, "dpr_bonus": 3.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Copiar um efeito aumenta DPR efetivo; cada cópia adicional soma DPR estimado."},
-
-    "Haunt":         {"cr_offense": 0.60, "cr_defense": 0.40, "dpr_bonus": 1.5, "hp_delta": 0, "save_dc_delta": 1,
-                      "notes": "Efeito retardado/recorrente — aumenta ofensa e resistência por triggers futuros."},
-
-    "Hellbent":      {"cr_offense": 0.50, "cr_defense": -0.25, "dpr_bonus": 1.5, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Bonus forte com mão vazia (condicional). Use como bônus situacional."},
-
-    "Convoke":       {"cr_offense": 0.30, "cr_defense": 0.10, "dpr_bonus": 0.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Habilidade de reduzir custos — utilitária, favorece força em grupo."},
-
-    "Graft":         {"cr_offense": 0.40, "cr_defense": 0.40, "dpr_bonus": 0.5, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Contadores que podem ser redistribuídos; aumenta durabilidade e sinergia."},
-
-    "Detain":        {"cr_offense": 1.00, "cr_defense": 0.50, "dpr_bonus": 0.0, "hp_delta": 0, "save_dc_delta": 2,
-                      "notes": "Bloqueio de permanent: forte controle — aplicar CD de resistência para o alvo."},
-
-    "Battalion":     {"cr_offense": 0.60, "cr_defense": 0.10, "dpr_bonus": 2.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Dispara com ataque em grupo (3 ou mais atacantes) — sinergia."},
-
-    "Cipher":        {"cr_offense": 1.50, "cr_defense": 0.0, "dpr_bonus": 5.0, "hp_delta": 0, "save_dc_delta": 1,
-                      "notes": "Repetição de feitiços ao causar dano — potencial de loop ofensivo elevado."},
-
-    "Scavenge":      {"cr_offense": 0.25, "cr_defense": 0.60, "dpr_bonus": 0.5, "hp_delta": 5, "save_dc_delta": 0,
-                      "notes": "Exilar criatura do cemitério para buff; tanto utilitário quanto defensivo."},
-
-    "Bloodrush":     {"cr_offense": 0.45, "cr_defense": -0.10, "dpr_bonus": 2.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Discard-to-buff; bom para combos, situacional."},
-
-    "Overload":      {"cr_offense": 1.50, "cr_defense": -0.25, "dpr_bonus": 4.0, "hp_delta": 0, "save_dc_delta": 1,
-                      "notes": "Transforma alvo em AoE; muito poderoso em multi-alvo."},
-
-    "Extort":        {"cr_offense": 0.20, "cr_defense": 0.20, "dpr_bonus": 0.5, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Pequeno drain ao conjurar; acumula com múltiplos casts."},
-
-    "Unleash":       {"cr_offense": 0.50, "cr_defense": -0.50, "dpr_bonus": 2.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "+1/+1 ao entrar; não pode bloquear se tem o marcador — trade-off ataque/defesa."},
-
-    "Populate":      {"cr_offense": 0.50, "cr_defense": 0.40, "dpr_bonus": 1.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Cria tokens — aumenta presença em campo e valor tático."},
-
-    "Evolve":        {"cr_offense": 0.45, "cr_defense": 0.45, "dpr_bonus": 1.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Escala com entrada de criaturas maiores; bom em jogos longos."},
-
-    "Addendum":      {"cr_offense": 0.25, "cr_defense": 0.10, "dpr_bonus": 0.5, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Bônus se usado na main phase; pequena vantagem estratégica."},
-
-    "Mentor":        {"cr_offense": 0.25, "cr_defense": 0.10, "dpr_bonus": 0.5, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Coloca +1/+1 em aliados menores; melhora ataques de small minions."},
-
-    "Surveil":       {"cr_offense": 0.15, "cr_defense": 0.10, "dpr_bonus": 0.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Manipulação de topo de deck/efeitos futuros — utilitário."},
-
-    "Undergrowth":   {"cr_offense": 0.50, "cr_defense": 0.50, "dpr_bonus": 1.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Escala fortemente com número de cards de criatura no cemitério; aplicar escala dinâmica."},
-
-    "Riot":          {"cr_offense": 0.50, "cr_defense": 0.10, "dpr_bonus": 2.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Escolha entre +1/+1 ou haste — útil e simples."},
-
-    "Jump-start":    {"cr_offense": 0.40, "cr_defense": 0.0, "dpr_bonus": 1.5, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Permite reusar feitiços do cemitério com custo; aumenta DPR em jogadas longas."},
-
-    "Afterlife":     {"cr_offense": 0.35, "cr_defense": 0.60, "dpr_bonus": 1.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Spawn de tokens ao morrer — acrescenta resistência via substitutos."},
-
-    "Spectacle":     {"cr_offense": 0.40, "cr_defense": 0.0, "dpr_bonus": 1.5, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Custo alternativo se um oponente perdeu vida — situacionalmente poderoso."},
-
-    "Convoke":       {"cr_offense": 0.30, "cr_defense": 0.10, "dpr_bonus": 0.0, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Permite gastar recursos aliados para pagar custos — utilitário de grupo."},
-
-    "Adapt":         {"cr_offense": 0.25, "cr_defense": 0.25, "dpr_bonus": 0.5, "hp_delta": 0, "save_dc_delta": 0,
-                      "notes": "Pagamento por counters; pequeno buff por recurso."},
 }
 
 # ==========================================================
@@ -665,35 +575,42 @@ NEW_TYPES_LOG_FILE = str(_DATA_TEMP / "newTypes.txt")
 # Reduced/lite versions: (Lite) suffix, cost = ceil(full_cost / 2)
 #
 TRAIT_BUDGETS = {
-    0: 1,      # CR 0-1: max 1 point (no traits or 1 very simple)
-    1: 1,
-    2: 2,      # CR 2: max 2 points (simple trait)
-    3: 3,      # CR 3-5: max 3 points (1-2 traits)
-    4: 3,
-    5: 4,
-    6: 4,      # CR 6-8: max 4-5 points (2-3 traits or 1 powerful)
-    7: 5,
-    8: 5,
-    9: 6,      # CR 9-12: max 6-7 points (multiple traits)
+    # CR 0: at most 1 point — one mono-color trait or nothing (CR 0 = weakest)
+    0:  1,
+    # CR 1: 2 points — one guild trait (cost 2) or one keyword + mono-color (1+1)
+    1:  2,
+    # CR 2-3: 3 points — starting to gain complexity
+    2:  3,
+    3:  3,
+    # CR 4-5: 4 points — one guild trait + a simple keyword
+    4:  4,
+    5:  4,
+    # CR 6-8: 5-6 points — meaningful multi-trait combinations
+    6:  5,
+    7:  5,
+    8:  6,
+    # CR 9-12: 6-8 points — multiple potent traits
+    9:  6,
     10: 7,
     11: 7,
-    12: 7,
-    13: 8,     # CR 13+: up to 8+ points (legendary complexity)
-    14: 8,
+    12: 8,
+    # CR 13+: 8-16 points — legendary complexity
+    13: 8,
+    14: 9,
     15: 9,
-    16: 9,
+    16: 10,
     17: 10,
-    18: 10,
+    18: 11,
     19: 11,
-    20: 11,
+    20: 12,
     21: 12,
-    22: 12,
+    22: 13,
     23: 13,
-    24: 13,
+    24: 14,
     25: 14,
-    26: 14,
+    26: 15,
     27: 15,
-    28: 15,
+    28: 16,
     29: 16,
     30: 16,
 }
