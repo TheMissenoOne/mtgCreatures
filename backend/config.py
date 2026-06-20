@@ -527,6 +527,7 @@ _DATA_OUTPUT = _PROJECT_ROOT / "data" / "output"
 _DATA_TEMP = _PROJECT_ROOT / "data" / "temp"
 
 INPUT_MONSTERS_FILE = str(_DATA_SOURCE / "monsters.json")
+INPUT_5ETOOLS_FILE = str(_DATA_SOURCE / "monsters_5etools.json")
 INPUT_RAVNICA_FILE = str(_DATA_SOURCE / "ravnicaCreatures.json")
 OUTPUT_MONSTERS_FILE = str(_DATA_OUTPUT / "finalMonsters.json")
 OUTPUT_RAVNICA_FILE = str(_DATA_OUTPUT / "final.json")
