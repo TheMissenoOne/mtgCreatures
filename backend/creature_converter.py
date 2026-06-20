@@ -182,7 +182,8 @@ class RavnicaCardConverter:
             }
         )
 
-        types = self._extract_creature_types(card)
+        primary_types, name_types = self._extract_creature_types(card)
+        types = list(dict.fromkeys(primary_types + name_types))
         keywords = self._extract_keywords_from_card(card)
         creature_cr = self._calculate_creature_cr(card, types, len(keywords))
 
@@ -190,7 +191,7 @@ class RavnicaCardConverter:
             creature.update(CHALLENGE_RATINGS[str(creature_cr)])
 
         self._calculate_abilities(creature, creature_cr, types, card)
-        self._merge_type_attributes(creature, types)
+        self._merge_type_attributes(creature, primary_types, name_types)
 
         if "flavor_text" in card:
             creature["description"] = card["flavor_text"]
@@ -222,12 +223,21 @@ class RavnicaCardConverter:
     # Type extraction
     # ------------------------------------------------------------------
 
-    def _extract_creature_types(self, card: Dict[str, Any]) -> List[str]:
+    def _extract_creature_types(
+        self, card: Dict[str, Any]
+    ) -> tuple:
         """Extract D&D-valid creature type keys from card type line and name.
 
-        Uses the semantic matcher to bridge unknown MTG subtypes to D&D creature names.
-        Name words are matched exactly only — not fed to the semantic matcher — to
-        avoid noise from words like 'Charger' or 'Steeple' pulling in unrelated bases.
+        Returns (primary_types, name_types):
+          primary_types — from the type_line subtypes (exact + semantic fallback)
+          name_types    — additional exact matches found in the card name
+
+        Keeping them separate lets callers prioritize name_types for meta/size
+        (e.g. 'Steeple Roc' should be Gargantuan like a Roc, not Tiny like a Bird)
+        while still using primary_types first for trait/action inheritance.
+
+        Name words are never fed to the semantic matcher — that avoids noise words
+        like 'Charger' or 'Steeple' pulling in unrelated base creatures.
         """
         # 1. Subtypes from type_line: exact match + semantic fallback for unknowns
         subtype_words: List[str] = []
@@ -249,16 +259,17 @@ class RavnicaCardConverter:
             semantic = self.matcher.find_matches_for_types(unknown_subtypes, max_matches=2)
             semantic = [m for m in semantic if m not in subtype_exact]
 
-        # 2. Name words: exact-match only against base creatures — no semantic matching.
-        #    This lets "Skymark Roc" inherit the 5e Roc without semantic noise.
-        matched_so_far = set(subtype_exact + semantic)
-        name_exact: List[str] = []
+        primary_types = list(dict.fromkeys(subtype_exact + semantic))
+
+        # 2. Name words: exact-match only — no semantic matching
+        matched_so_far = set(primary_types)
+        name_types: List[str] = []
         for part in card.get("name", "").split():
             if part in self.base_creatures and part not in matched_so_far:
-                name_exact.append(part)
+                name_types.append(part)
                 matched_so_far.add(part)
 
-        return list(dict.fromkeys(subtype_exact + semantic + name_exact))
+        return primary_types, name_types
 
     # ------------------------------------------------------------------
     # CR calculation
@@ -433,14 +444,34 @@ class RavnicaCardConverter:
         return ", ".join(result) if result else "30 ft."
 
     def _merge_type_attributes(
-        self, creature: Dict[str, Any], types: List[str]
+        self,
+        creature: Dict[str, Any],
+        primary_types: List[str],
+        name_types: Optional[List[str]] = None,
     ) -> None:
-        """Merge Traits/Actions/Languages/Speed from matched D&D base creatures."""
+        """Merge Traits/Actions/Languages/Speed from matched D&D base creatures.
+
+        meta/size is set from name_types first (they identify what the creature
+        actually IS — e.g. 'Roc' > 'Bird'), then falls back to primary_types.
+        Traits/Actions are applied primary-first so type_line drives the core
+        stat block and name matches augment it.
+        """
+        name_types = name_types or []
+        all_types = list(dict.fromkeys(primary_types + name_types))
+
+        # meta priority: name-matched creature first (more specific), then type-line
+        for creature_type in (name_types + primary_types):
+            if creature_type in self.base_creatures:
+                base = self.base_creatures[creature_type]
+                if base.get("meta") and not creature.get("meta"):
+                    creature["meta"] = base["meta"]
+                    break
+
         speed_parts: List[str] = []
         if creature.get("Speed"):
             speed_parts.append(creature["Speed"])
 
-        for creature_type in types:
+        for creature_type in all_types:
             if creature_type not in self.base_creatures:
                 continue
 
@@ -458,9 +489,6 @@ class RavnicaCardConverter:
 
             if "Speed" in base:
                 speed_parts.append(base["Speed"])
-
-            if "meta" in base and not creature.get("meta"):
-                creature["meta"] = base["meta"]
 
         if speed_parts:
             creature["Speed"] = self._merge_speeds(speed_parts)
