@@ -1,5 +1,6 @@
 let CREATURES_DATABASE = null;
 let _encounterCreaturesData = [];
+let _usedCreatureNames = new Set();
 
 const GUILD_COLORS = {
     azorius: ["W", "U"],
@@ -239,6 +240,95 @@ const ENVIRONMENTS = {
     },
 };
 
+// =============================================================
+// Synergy classification system
+// Tags are lowercased to match normalized keyword/type data.
+// =============================================================
+
+const SYNERGY_GROUPS = [
+    { label: "Legion Strike Force",   tags: ["battalion", "soldier", "knight", "mentor", "first strike"] },
+    { label: "Aerial Assault",        tags: ["flying", "bird", "drake", "flash", "vigilance"] },
+    { label: "Savage Hunt",           tags: ["trample", "haste", "riot", "bloodthirst", "bloodrush", "beast"] },
+    { label: "Undead Horde",          tags: ["afterlife", "zombie", "spirit", "scavenge"] },
+    { label: "Mutagenic Vanguard",    tags: ["evolve", "adapt", "proliferate", "insect", "elemental"] },
+    { label: "Shadow Network",        tags: ["surveil", "mill", "rogue", "deathtouch"] },
+    { label: "Nature's Wardens",      tags: ["defender", "reach", "lifelink", "elf", "druid"] },
+    { label: "Berserker Warband",     tags: ["unleash", "haste", "berserker", "goblin"] },
+    { label: "Spectral Congregation", tags: ["afterlife", "spirit", "extort", "convoke", "cleric"] },
+    { label: "Shamanic Circle",       tags: ["shaman", "elf", "druid", "bloodrush"] },
+    { label: "Arcane Cabal",          tags: ["wizard", "vedalken", "adapt", "surveil"] },
+    { label: "Warrior Warband",       tags: ["warrior", "human", "mentor", "vigilance"] },
+    { label: "Debt Collectors",       tags: ["extort", "vampire", "thrull", "specter"] },
+    { label: "Spectacle of Carnage",  tags: ["unleash", "menace", "demon", "devil", "berserker"] },
+    { label: "Aerial Guard",          tags: ["flying", "vigilance", "reach", "defender"] },
+];
+
+// Extract creature subtypes from MTG type_line (text after '—')
+function getCreatureSubtypes(data) {
+    const line = data.type_line || '';
+    const dash = line.indexOf(' — ');
+    if (dash < 0) return [];
+    return line.slice(dash + 3).split(' ').filter(Boolean);
+}
+
+// Build a normalized tag set for a creature (keywords + subtypes, lowercase)
+function creatureTags(c) {
+    return new Set([
+        ...(c.data.keywords || []).map(k => k.toLowerCase()),
+        ...getCreatureSubtypes(c.data).map(t => t.toLowerCase()),
+    ]);
+}
+
+// Score synergy between two encounter creatures (higher = more thematic)
+function scoreSynergy(a, b) {
+    let score = 0;
+    const tagsA = creatureTags(a);
+    const tagsB = creatureTags(b);
+
+    // Shared creature subtypes
+    for (const t of tagsA) {
+        if (tagsB.has(t)) score += 3;
+    }
+
+    // Same guild/color combination
+    const colA = (a.colors || []).slice().sort().join('');
+    const colB = (b.colors || []).slice().sort().join('');
+    if (colA === colB && colA) score += 2;
+
+    // Synergy group overlap
+    for (const group of SYNERGY_GROUPS) {
+        const aHits = group.tags.filter(t => tagsA.has(t)).length;
+        const bHits = group.tags.filter(t => tagsB.has(t)).length;
+        if (aHits > 0 && bHits > 0) score += Math.min(aHits, bHits) * 2;
+    }
+
+    return score;
+}
+
+// Identify the dominant synergy theme for a group of selected creatures
+function classifyEncounterGroup(selected) {
+    const allTags = new Set();
+    for (const c of selected) {
+        for (const t of creatureTags(c)) allTags.add(t);
+    }
+    let best = null;
+    let bestOverlap = 1; // require at least 2 tag matches
+    for (const group of SYNERGY_GROUPS) {
+        const overlap = group.tags.filter(t => allTags.has(t)).length;
+        if (overlap > bestOverlap) { bestOverlap = overlap; best = group; }
+    }
+    return best;
+}
+
+// Weighted random pick from a pool
+function pickWeightedRandom(pool, weightFn) {
+    const total = pool.reduce((s, c) => s + weightFn(c), 0);
+    if (total <= 0) return pool[Math.floor(Math.random() * pool.length)];
+    let r = Math.random() * total;
+    for (const c of pool) { r -= weightFn(c); if (r <= 0) return c; }
+    return pool[pool.length - 1];
+}
+
 const CR_XP_VALUES = {
     0: 10, "1/8": 25, "1/4": 50, "1/2": 100,
     1: 200, 2: 450, 3: 700, 4: 1100,
@@ -396,37 +486,75 @@ function randomHook(env) {
     return env.hooks[Math.floor(Math.random() * env.hooks.length)];
 }
 
-async function selectCreaturesForEncounter(envKey, targetXP, partyLevel, difficulty) {
+async function selectCreaturesForEncounter(envKey, targetXP, partyLevel, partySize, difficulty) {
     const creatures = await loadCreatures();
     if (!creatures) return [];
 
     const crMult = { easy: 0.5, medium: 1, hard: 1.5, deadly: 2 }[difficulty] || 1;
     const baseCR = partyLevel * crMult;
-    const variance = 2 + partyLevel / 5;
+    // Wider variance = bigger pool = more variety across rolls
+    const variance = 2.5 + partyLevel / 4;
     const minCR = Math.max(0, baseCR - variance);
     const maxCR = baseCR + variance;
 
     let pool = filterCreaturesForEnvironment(creatures, envKey, minCR, maxCR);
+    // Widen CR window if pool is thin
+    if (pool.length < 5) pool = filterCreaturesForEnvironment(creatures, envKey, 0, 30);
+    if (!pool.length)    pool = filterCreaturesForEnvironment(creatures, 'ravnica_plaza', minCR, maxCR);
+    if (!pool.length)    return [];
 
-    if (!pool.length) {
-        pool = filterCreaturesForEnvironment(creatures, envKey, 0, 30);
-    }
-    // Final fallback: open market (any creature) in CR range
-    if (!pool.length) {
-        pool = filterCreaturesForEnvironment(creatures, 'ravnica_plaza', minCR, maxCR);
-    }
+    // Deduplicate by name (defensive guard)
+    const seen = new Set();
+    pool = pool.filter(c => { if (seen.has(c.name)) return false; seen.add(c.name); return true; });
 
-    const shuffled = [...pool].sort(() => Math.random() - 0.5);
-    const selected = [];
-    let total = 0;
-    for (const c of shuffled) {
-        if (total + c.xp <= targetXP * 1.5) {
-            selected.push(c);
-            total += c.xp;
+    // Penalize creatures used earlier this session to maximise variety
+    const weight = c => _usedCreatureNames.has(c.name) ? 0.15 : 1.0;
+
+    // Pick a seed creature via weighted random (prefers un-used creatures)
+    const seed = pickWeightedRandom(pool, weight);
+
+    // Score every other candidate: synergy with seed + jitter + usage penalty
+    const candidates = pool
+        .filter(c => c.name !== seed.name)
+        .map(c => ({
+            creature: c,
+            score: scoreSynergy(seed, c) * 2
+                   + Math.random() * 1.5
+                   - (_usedCreatureNames.has(c.name) ? 3 : 0),
+        }))
+        .sort((a, b) => b.score - a.score);
+
+    // Max creature count scales with party size
+    const maxCount = Math.max(2, Math.min(6, Math.round(partySize * 1.25)));
+
+    // Greedy XP-budget fill, synergy-first
+    const selected = [seed];
+    let totalXP = seed.xp;
+
+    for (const { creature } of candidates) {
+        if (selected.length >= maxCount) break;
+        if (totalXP + creature.xp <= targetXP * 1.5) {
+            selected.push(creature);
+            totalXP += creature.xp;
         }
-        if (selected.length >= 4) break;
     }
-    return selected.length ? selected : shuffled.slice(0, Math.min(2, shuffled.length));
+
+    // If budget was too tight, pad with cheapest available to reach at least 2
+    if (selected.length < 2) {
+        const byXP = [...pool].sort((a, b) => a.xp - b.xp);
+        for (const c of byXP) {
+            if (!selected.find(s => s.name === c.name)) {
+                selected.push(c);
+                if (selected.length >= 2) break;
+            }
+        }
+    }
+
+    // Track used names; reset after 30 distinct creatures so creatures recycle eventually
+    selected.forEach(c => _usedCreatureNames.add(c.name));
+    if (_usedCreatureNames.size > 30) _usedCreatureNames.clear();
+
+    return selected;
 }
 
 async function generateEncounter() {
@@ -451,10 +579,11 @@ async function generateEncounter() {
     const thresholds = calculateThresholds(partyLevel, partySize);
     const targetXP = thresholds[difficulty];
 
-    const creatures = await selectCreaturesForEncounter(envKey, targetXP, partyLevel, difficulty);
+    const creatures = await selectCreaturesForEncounter(envKey, targetXP, partyLevel, partySize, difficulty);
     const totalXP = creatures.reduce((s, c) => s + c.xp, 0);
     const adjustedXP = Math.round(totalXP * (partySize / 4));
     const hook = randomHook(env);
+    const synergyGroup = classifyEncounterGroup(creatures);
 
     _encounterCreaturesData = creatures;
 
@@ -463,14 +592,16 @@ async function generateEncounter() {
         const thumbStyle = artUrl
             ? `background-image:url(${artUrl});background-size:cover;background-position:center top;`
             : 'background:#1c2230;';
-        const guilds = env.guilds.includes('any') ? '' :
-            env.guilds.map(g => `<span class="guild-tag ${g}">${g}</span>`).join('');
+        const subtypes = getCreatureSubtypes(c.data).slice(0, 3).join(' · ');
+        const keywords = (c.data.keywords || []).slice(0, 3).join(', ');
+        const tagsLine = [subtypes, keywords].filter(Boolean).join(' — ');
         return `<div class="encounter-card" onclick="toggleStatBlock(this,${i})">
             <div class="encounter-card-header">
                 <div class="encounter-card-thumb" style="${thumbStyle}"></div>
                 <div class="encounter-card-info">
                     <strong>${c.name}</strong>
-                    <div class="encounter-card-meta">CR ${c.rawCR} &bull; ${c.xp} XP &bull; ${c.data.meta || ''}</div>
+                    <div class="encounter-card-meta">CR ${c.rawCR} &bull; ${c.xp} XP</div>
+                    ${tagsLine ? `<div class="encounter-card-tags">${tagsLine}</div>` : ''}
                 </div>
                 <span class="expand-arrow">&#9660;</span>
             </div>
@@ -499,6 +630,7 @@ async function generateEncounter() {
         </div>
         <div class="result-footer">
             <span class="difficulty-indicator difficulty-${difficulty}">${formatDifficulty(difficulty)}</span>
+            ${synergyGroup ? `<span class="synergy-badge">${synergyGroup.label}</span>` : ''}
             <span class="footer-party">${partySize} players &bull; Level ${partyLevel}</span>
             <button class="reroll-btn" onclick="generateEncounter()">Roll Again</button>
         </div>
