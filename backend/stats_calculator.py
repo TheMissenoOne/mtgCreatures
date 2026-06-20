@@ -242,31 +242,34 @@ class StatBlockCalculator:
         base_creature: Dict[str, Any],
         type_creatures: list[Dict[str, Any]],
     ) -> Dict[str, Any]:
-        """
-        Merge stats from multiple creature types.
-        
-        Args:
-            base_creature: Base creature stats
-            type_creatures: List of creature type stats to merge
-            
-        Returns:
-            Updated creature with merged stats
+        """Merge ability scores from matched D&D type creatures.
+
+        Base creatures store ability scores as ``10 + delta`` where delta is the
+        deviation from the expected value for their own CR
+        (see MonsterProcessor.process_monsters). Averaging raw scores would
+        dilute the card's CR-scaling — a CR 8 card averaging with a CR 11 Roc's
+        raw STR of 19 would get 17, not the 25 it deserves.
+
+        Instead we extract each type's per-attribute delta (``type.attr - 10``),
+        average those deltas, then add the result to the card's already-CR-scaled
+        base score. This preserves CR-appropriate scaling while still inheriting
+        the archetype's relative strengths and weaknesses.
         """
         result = base_creature.copy()
-        
+
         if not type_creatures:
             return result
 
-        # Average ability scores across types
         for attr in ATTRIBUTES:
-            scores = [int(base_creature.get(attr, 10))]
-            scores.extend(int(t.get(attr, 10)) for t in type_creatures)
-            
-            avg_score = sum(scores) // len(scores)
-            result[attr] = avg_score
-            result[f"{attr}_mod"] = calculate_ability_modifier(avg_score)
+            base_score = int(base_creature.get(attr, 10))
+            # Each type stores attr as 10+delta; extract the deltas and average them
+            deltas = [int(t.get(attr, 10)) - 10 for t in type_creatures]
+            avg_delta = sum(deltas) // len(deltas)
+            final_score = min(30, max(1, base_score + avg_delta))
+            result[attr] = final_score
+            result[f"{attr}_mod"] = calculate_ability_modifier(final_score)
 
-        # Average HP and AC
+        # AC and HP are bounded by apply_defensive_budgets later; average is fine
         hp_values = [int(base_creature.get("Hit Points", 10))]
         hp_values.extend(int(t.get("Hit Points", 10)) for t in type_creatures)
         result["Hit Points"] = sum(hp_values) // len(hp_values)
