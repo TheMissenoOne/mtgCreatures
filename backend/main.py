@@ -6,6 +6,7 @@ from pathlib import Path
 
 from config import (
     INPUT_MONSTERS_FILE,
+    INPUT_5ETOOLS_FILE,
     INPUT_RAVNICA_FILE,
     OUTPUT_MONSTERS_FILE,
     OUTPUT_RAVNICA_FILE,
@@ -22,22 +23,51 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def load_all_base_creatures() -> list:
+    """Load base creatures from monsters.json and 5etools data (if available)."""
+    creatures = []
+    seen_names: set = set()
+
+    try:
+        base = load_json(INPUT_MONSTERS_FILE)
+        for c in base:
+            seen_names.add(c.get("name", ""))
+        creatures.extend(base)
+        logger.info(f"Loaded {len(base)} base creatures from {INPUT_MONSTERS_FILE}")
+    except FileNotFoundError:
+        logger.warning(f"Base monsters file not found: {INPUT_MONSTERS_FILE}")
+
+    if Path(INPUT_5ETOOLS_FILE).exists():
+        try:
+            tools_data = load_json(INPUT_5ETOOLS_FILE)
+            added = 0
+            for c in tools_data:
+                name = c.get("name", "")
+                if name and name not in seen_names:
+                    seen_names.add(name)
+                    creatures.append(c)
+                    added += 1
+            logger.info(f"Merged {added} additional creatures from 5e.tools data")
+        except Exception as exc:
+            logger.warning(f"Could not load 5e.tools data: {exc}")
+
+    return creatures
+
+
 def process_base_monsters() -> dict:
     """
     Process base monster data and save to file.
-    
+
     Returns:
         Dictionary of processed monsters
     """
     logger.info("=" * 60)
     logger.info("STAGE 1: Processing base monsters")
     logger.info("=" * 60)
-    
-    try:
-        creatures = load_json(INPUT_MONSTERS_FILE)
-        logger.info(f"Loaded {len(creatures)} base creatures from {INPUT_MONSTERS_FILE}")
-    except FileNotFoundError:
-        logger.error(f"Cannot find {INPUT_MONSTERS_FILE}")
+
+    creatures = load_all_base_creatures()
+    if not creatures:
+        logger.error("No base creatures found.")
         return {}
 
     processor = MonsterProcessor(NEW_TYPES_LOG_FILE)
@@ -45,7 +75,7 @@ def process_base_monsters() -> dict:
 
     save_json(processed, OUTPUT_MONSTERS_FILE)
     logger.info(f"Saved {len(processed)} processed monsters to {OUTPUT_MONSTERS_FILE}")
-    
+
     return processed
 
 

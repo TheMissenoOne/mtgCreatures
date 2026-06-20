@@ -421,6 +421,29 @@
         .guild-tag.boros    { background: #ffccbc; color: #bf360c; }
         .guild-tag.simic    { background: #b2dfdb; color: #00695c; }
 
+        /* Creature card keyword/type line */
+        .encounter-card-tags {
+            font-size: 0.72em;
+            color: #6b7a99;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Synergy group badge in result footer */
+        .synergy-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            background: rgba(139,92,246,0.18);
+            border: 1px solid rgba(139,92,246,0.4);
+            color: #c4b0ff;
+            letter-spacing: 0.3px;
+        }
+
         /* ── Responsive ── */
         @media (max-width: 640px) {
             .encounters-container { padding: 12px; }
