@@ -225,38 +225,40 @@ class RavnicaCardConverter:
     def _extract_creature_types(self, card: Dict[str, Any]) -> List[str]:
         """Extract D&D-valid creature type keys from card type line and name.
 
-        Uses the semantic matcher to bridge unknown MTG types to D&D creature names.
+        Uses the semantic matcher to bridge unknown MTG subtypes to D&D creature names.
+        Name words are matched exactly only — not fed to the semantic matcher — to
+        avoid noise from words like 'Charger' or 'Steeple' pulling in unrelated bases.
         """
-        raw_types: List[str] = []
-
-        # Primary: subtypes from type_line (e.g., "Creature — Human Warrior" → ["Human", "Warrior"])
+        # 1. Subtypes from type_line: exact match + semantic fallback for unknowns
+        subtype_words: List[str] = []
         type_line = card.get("type_line", "")
         if " — " in type_line:
-            raw_types.extend(type_line.split(" — ")[1].split())
+            subtype_words = type_line.split(" — ")[1].split()
 
-        # Fallback: words in card name
-        for part in card.get("name", "").split():
-            if part not in raw_types:
-                raw_types.append(part)
-
-        exact: List[str] = []
-        unknown: List[str] = []
-
-        for t in raw_types:
+        subtype_exact: List[str] = []
+        unknown_subtypes: List[str] = []
+        for t in subtype_words:
             if t in self.base_creatures:
-                exact.append(t)
+                subtype_exact.append(t)
             else:
                 self.new_types.add(t)
-                unknown.append(t)
+                unknown_subtypes.append(t)
 
-        # Semantic fallback for types not found by exact match
         semantic: List[str] = []
-        if unknown and self.matcher is not None:
-            semantic = self.matcher.find_matches_for_types(unknown, max_matches=2)
-            # Only keep matches not already in exact
-            semantic = [m for m in semantic if m not in exact]
+        if unknown_subtypes and self.matcher is not None:
+            semantic = self.matcher.find_matches_for_types(unknown_subtypes, max_matches=2)
+            semantic = [m for m in semantic if m not in subtype_exact]
 
-        return list(dict.fromkeys(exact + semantic))  # deduplicate, preserve order
+        # 2. Name words: exact-match only against base creatures — no semantic matching.
+        #    This lets "Skymark Roc" inherit the 5e Roc without semantic noise.
+        matched_so_far = set(subtype_exact + semantic)
+        name_exact: List[str] = []
+        for part in card.get("name", "").split():
+            if part in self.base_creatures and part not in matched_so_far:
+                name_exact.append(part)
+                matched_so_far.add(part)
+
+        return list(dict.fromkeys(subtype_exact + semantic + name_exact))
 
     # ------------------------------------------------------------------
     # CR calculation
@@ -393,10 +395,51 @@ class RavnicaCardConverter:
     # Type attribute merging
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _merge_speeds(speed_strings: List[str]) -> str:
+        """Merge multiple speed strings, keeping the maximum value per movement mode."""
+        modes: Dict[str, int] = {}
+        hover = False
+        for s in speed_strings:
+            if not s:
+                continue
+            if "(hover)" in s.lower():
+                hover = True
+            for segment in s.split(","):
+                segment = segment.strip().lower().replace("(hover)", "").strip()
+                if not segment:
+                    continue
+                parts = segment.split()
+                # Patterns: "30 ft." or "fly 120 ft." or "burrow 30 ft."
+                if len(parts) >= 2 and parts[-1].startswith("ft"):
+                    try:
+                        val = int(parts[-2])
+                        mode = parts[0] if not parts[0].isdigit() else "walk"
+                        if val > modes.get(mode, 0):
+                            modes[mode] = val
+                    except (ValueError, IndexError):
+                        pass
+
+        if not modes:
+            return "30 ft."
+
+        result: List[str] = []
+        if "walk" in modes:
+            result.append(f"{modes['walk']} ft.")
+        for mode in ("burrow", "climb", "fly", "swim"):
+            if modes.get(mode, 0) > 0:
+                h = " (hover)" if mode == "fly" and hover else ""
+                result.append(f"{mode} {modes[mode]} ft.{h}")
+        return ", ".join(result) if result else "30 ft."
+
     def _merge_type_attributes(
         self, creature: Dict[str, Any], types: List[str]
     ) -> None:
         """Merge Traits/Actions/Languages/Speed from matched D&D base creatures."""
+        speed_parts: List[str] = []
+        if creature.get("Speed"):
+            speed_parts.append(creature["Speed"])
+
         for creature_type in types:
             if creature_type not in self.base_creatures:
                 continue
@@ -409,12 +452,18 @@ class RavnicaCardConverter:
                     traits = re.sub(re.escape(keyword), replacement, traits, flags=re.IGNORECASE)
                 creature["Traits"] = creature.get("Traits", "") + traits
 
-            for attr in ["Actions", "Languages", "Speed", "Senses"]:
+            for attr in ["Actions", "Languages", "Senses"]:
                 if attr in base:
                     creature[attr] = creature.get(attr, "") + base[attr]
 
+            if "Speed" in base:
+                speed_parts.append(base["Speed"])
+
             if "meta" in base and not creature.get("meta"):
                 creature["meta"] = base["meta"]
+
+        if speed_parts:
+            creature["Speed"] = self._merge_speeds(speed_parts)
 
     # ------------------------------------------------------------------
     # Keyword extraction (improved)
